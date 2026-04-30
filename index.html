@@ -7,538 +7,401 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --energisa-blue: #005596; --energisa-orange: #F37021; --energisa-gray: #F2F2F2; }
-        body { font-family: 'Open Sans', sans-serif; background-color: var(--energisa-gray); }
-        .header-stripe { height: 8px; background: linear-gradient(90deg, #005596 0%, #005596 70%, #F37021 70%, #F37021 100%); }
+        :root { --blue: #005596; --orange: #F37021; --gray: #F2F2F2; }
+        body { font-family: 'Open Sans', sans-serif; background: var(--gray); }
+        .header-stripe { height: 8px; background: linear-gradient(90deg, #005596 70%, #F37021 70%); }
         .card { background: white; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; padding: 2rem; }
-        
-        /* TABELAS */
-        .exec-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        .exec-table thead th { 
-            background: #005596; color: white; padding: 12px 8px; text-align: center; 
-            font-weight: 700; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px;
+
+        /* TABELA */
+        .exec-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .exec-table thead th {
+            background: #005596; color: white; padding: 10px 5px;
+            text-align: center; font-weight: 700; text-transform: uppercase; font-size: 8px;
         }
-        .exec-table tbody tr { border-bottom: 1px solid #e5e7eb; transition: all 0.2s; }
-        .exec-table tbody tr:hover { background: #f0f7ff; }
-        .exec-table td { padding: 10px 8px; }
-        
+        .exec-table thead th.yr {
+            background: linear-gradient(135deg, #005596 0%, #003d6b 100%);
+        }
+        .exec-table thead th.yr2026 {
+            background: linear-gradient(135deg, #F37021 0%, #c85c0d 100%);
+        }
+        .exec-table thead th.yr small {
+            display: block; font-size: 7px; font-weight: 400; opacity: .85; margin-bottom: 2px;
+        }
+        .exec-table tbody tr { border-bottom: 1px solid #e5e7eb; transition: background .15s; }
+        .exec-table tbody tr:nth-child(even) { background: #f9f9f9; }
+        .exec-table tbody tr:hover { background: #e8f4ff !important; }
+        .exec-table td { padding: 8px 5px; vertical-align: middle; }
+
         /* COLUNAS */
-        .name-col { font-weight: 700; color: #005596; min-width: 220px; text-align: left; }
-        .name-col.energisa { color: #F37021; }
-        .meta-col { font-size: 10px; color: #666; text-align: left; }
-        
-        /* QTD vs VALOR */
-        .qty-cell { text-align: center; font-weight: 700; color: #005596; background: rgba(0,85,150,0.05); border-radius: 3px; padding: 6px 4px; }
-        .value-cell { text-align: right; font-weight: 600; color: #059669; }
-        
-        /* BADGES ANO */
-        .year-header { background: linear-gradient(135deg, #005596 0%, #003d6b 100%); color: white; font-weight: 800; }
-        .year-sub { font-size: 8px; opacity: 0.9; font-weight: 400; }
-        
-        /* TOTALIZADORES */
-        .total-row { background: linear-gradient(90deg, #f0f7ff 0%, #e8f4f8 100%); border-top: 2px solid #005596; border-bottom: 2px solid #005596; font-weight: 700; }
-        .total-row td { color: #005596; padding: 12px 8px; }
-        
-        /* KPI HEADER */
-        .kpi-header { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .kpi-item { background: linear-gradient(135deg, #f0f7ff 0%, #fff 100%); padding: 1.2rem; border-radius: 6px; border-top: 3px solid #005596; text-align: center; }
-        .kpi-value { font-size: 28px; font-weight: 900; color: #005596; line-height: 1; }
-        .kpi-label { font-size: 10px; color: #9ca3bf; text-transform: uppercase; margin-top: 6px; letter-spacing: 0.5px; }
-        
-        /* ALERT */
-        .alert-box { display: flex; gap: 12px; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid; font-size: 12px; }
-        .alert-critical { background: #fff5f5; border-color: #ed1c24; color: #991b1b; }
-        .alert-warning { background: #fffbeb; border-color: #F37021; color: #92400e; }
-        .alert-success { background: #f0fdf4; border-color: #10b981; color: #065f46; }
-        
-        /* SEÇÃO HEADER */
-        .section-hero { background: linear-gradient(135deg, #005596 0%, #003d6b 100%); padding: 18px 2rem; border-radius: 6px 6px 0 0; }
-        .section-hero h3 { color: white; font-size: 16px; font-weight: 700; margin: 0; }
-        .section-hero p { color: #dbeafe; font-size: 11px; margin: 4px 0 0 0; }
-        
-        /* LEGENDA */
-        .legend-row { display: flex; gap: 2rem; padding: 1rem 2rem; background: #f9f9f9; border-top: 1px solid #e5e7eb; font-size: 11px; }
-        .legend-item { display: flex; gap: 8px; align-items: center; }
-        .legend-badge { padding: 3px 8px; background: rgba(0,85,150,0.1); color: #005596; border-radius: 3px; font-weight: 700; font-size: 9px; }
-        
-        /* CONCLUSÕES */
-        .insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
-        .insight-card { padding: 1rem; background: white; border-radius: 6px; border-top: 3px solid #005596; }
-        .insight-value { font-size: 22px; font-weight: 900; color: #005596; }
-        .insight-label { font-size: 10px; color: #9ca3bf; text-transform: uppercase; margin-top: 6px; }
-        
-        @media print { .no-print { display: none; } body { background: white; } .card { box-shadow: none; } }
+        .col-name { font-weight: 700; color: #005596; min-width: 200px; text-align: left; font-size: 9px; }
+        .col-name.en { color: #F37021; }
+        .col-grupo { font-size: 9px; color: #666; text-align: left; white-space: nowrap; }
+        .col-qty { text-align: center; font-weight: 800; color: #005596;
+                    background: rgba(0,85,150,0.07); border-radius: 3px; padding: 3px 4px; }
+        .col-qty.q26 { background: rgba(243,112,33,0.12); color: #F37021; }
+        .col-val { text-align: right; font-weight: 600; color: #059669; font-size: 9px; }
+        .col-val.v26 { color: #F37021; font-style: italic; font-size: 8px; }
+        .col-tot-ops { text-align: center; font-weight: 800; color: #005596; font-size: 9px; }
+        .col-tot-val { text-align: right; font-weight: 800; color: #059669; font-size: 9px; }
+        .col-pct { text-align: center; font-weight: 800; color: #F37021; font-size: 9px; }
+
+        /* TOTAL ROW */
+        .total-row { background: linear-gradient(90deg,#f0f7ff,#e8f4f8) !important;
+                      border-top: 2px solid #005596; border-bottom: 2px solid #005596; font-weight: 700; }
+        .total-row td { color: #005596; padding: 10px 5px; }
+
+        /* KPI */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(110px,1fr)); gap: .8rem; margin-bottom: 1.5rem; }
+        .kpi-item { background: linear-gradient(135deg,#f0f7ff,#fff); padding: 1rem;
+                     border-radius: 6px; border-top: 3px solid #005596; text-align: center; }
+        .kpi-val { font-size: 22px; font-weight: 900; color: #005596; line-height: 1; }
+        .kpi-lbl { font-size: 9px; color: #9ca3bf; text-transform: uppercase; margin-top: 4px; }
+
+        /* ALERTAS */
+        .alert { display: flex; gap: 10px; padding: 10px; border-radius: 6px;
+                  margin-bottom: 10px; border-left: 4px solid; font-size: 11px; }
+        .alert-red   { background:#fff5f5; border-color:#ed1c24; color:#991b1b; }
+        .alert-orange{ background:#fffbeb; border-color:#F37021; color:#92400e; }
+        .alert-green { background:#f0fdf4; border-color:#10b981; color:#065f46; }
+
+        /* SECTION HEADER */
+        .sec-hero { background: linear-gradient(135deg,#005596,#003d6b);
+                     padding: 14px 1.5rem; border-radius: 6px 6px 0 0; }
+        .sec-hero h3 { color: white; font-size: 14px; font-weight: 700; margin: 0; }
+        .sec-hero p  { color: #dbeafe; font-size: 10px; margin: 3px 0 0; }
+
+        /* INSIGHTS */
+        .ins-sec  { padding: 1.2rem 1.5rem; background: #f9f9f9; border-top: 1px solid #e5e7eb; }
+        .ins-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap: 1rem; }
+        .ins-item { font-size: 10px; line-height: 1.4; color: #444; }
+        .ins-item strong { display: block; font-size: 11px; margin-bottom: 4px; color: #005596; }
+        .ins-item.alert26 { border-left: 3px solid #F37021; padding-left: 8px; }
+        .ins-item.alert26 strong { color: #F37021; }
+
+        @media print { .no-print { display:none; } body { background:white; } .card { box-shadow:none; } }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-3 md:p-6">
 <div class="max-w-7xl mx-auto">
 
-    <!-- HEADER -->
-    <header class="card !p-0 overflow-hidden mb-8">
-        <div class="p-8 flex flex-col md:flex-row justify-between items-start bg-white">
+<!-- HEADER -->
+<header class="card !p-0 overflow-hidden mb-6">
+    <div class="p-6 flex flex-col md:flex-row justify-between items-start">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:#005596;">
+                <span class="text-white font-black text-xl">e</span>
+            </div>
             <div>
-                <div class="flex items-center space-x-3 mb-4">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background:#005596;">
-                        <span class="text-white font-bold text-2xl">e</span>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-black tracking-tight" style="color:#005596;">ENERGISA</h1>
-                        <p class="text-xs text-gray-500 font-bold">Inteligência Regulatória</p>
-                    </div>
-                </div>
-            </div>
-            <div class="text-right">
-                <p class="text-sm font-bold uppercase tracking-wider text-gray-500">Autos de Infração ANEEL</p>
-                <p class="text-2xl font-black" style="color:#F37021;">2018–2026</p>
-                <p class="text-xs text-gray-400 mt-1">Penalidades Impostas • Atualizado: 29/04/2026</p>
+                <h1 class="text-2xl font-black" style="color:#005596;">ENERGISA</h1>
+                <p class="text-xs text-gray-500 font-bold">Inteligência Regulatória</p>
             </div>
         </div>
-        <div class="header-stripe"></div>
-    </header>
-
-    <!-- TÍTULO -->
-    <section class="mb-6">
-        <h2 class="text-2xl font-black mb-2" style="color:#005596;">Análise de Autos de Infração: Distribuidoras e Grupos</h2>
-        <p class="text-gray-600 text-sm">26 distribuidoras | 14 grupos econômicos | 44 autos de infração | R$ 278,1 Mi em penalidades (2018-2026)</p>
-    </section>
-
-    <!-- ALERTAS -->
-    <div style="margin-bottom: 2rem;">
-        <div class="alert-box alert-critical">
-            <div style="flex-shrink: 0; font-size: 18px;">🔴</div>
-            <div><strong>RISCO CRÍTICO:</strong> Top 3 distribuidoras acumulam 44,8% das penalidades (R$ 105M em multas)</div>
-        </div>
-        <div class="alert-box alert-warning">
-            <div style="flex-shrink: 0; font-size: 18px;">🟡</div>
-            <div><strong>CONCENTRAÇÃO TEMPORAL:</strong> 32% de todos os autos (14 de 44) ocorreram em 2020. Período crítico de fiscalização.</div>
-        </div>
-        <div class="alert-box alert-success">
-            <div style="flex-shrink: 0; font-size: 18px;">🟢</div>
-            <div><strong>PERFORMANCE ENERGISA:</strong> 9 distribuidoras em grupo, porém apenas 3,5% das penalidades totais (R$ 9,7M). Melhor conformidade relativa.</div>
+        <div class="text-right">
+            <p class="text-sm font-bold uppercase tracking-wider text-gray-500">Autos de Infração ANEEL</p>
+            <p class="text-xl font-black" style="color:#F37021;">2018–2026</p>
+            <p class="text-xs text-gray-400 mt-1">Atualizado: 30/04/2026</p>
         </div>
     </div>
+    <div class="header-stripe"></div>
+</header>
 
-    <!-- ============================================================ -->
-    <!-- TABELA 1: DISTRIBUIDORAS -->
-    <!-- ============================================================ -->
-    <div class="card !p-0 overflow-hidden">
-        <div class="section-hero">
-            <h3>📊 TABELA 1: AUTOS DE INFRAÇÃO POR DISTRIBUIDORA</h3>
-            <p>26 entidades | 44 autos | Quantidade e valor separados por ano</p>
-        </div>
+<!-- TÍTULO -->
+<section class="mb-5">
+    <h2 class="text-xl font-black mb-1" style="color:#005596;">Análise de Autos de Infração: Distribuidoras e Grupos</h2>
+    <p class="text-gray-500 text-xs">78 autos registrados (2018–2025) | R$ 1.271,7 Mi em penalidades | 2026: processos em análise</p>
+</section>
 
-        <div style="padding: 1.5rem 2rem;">
-            <div class="kpi-header">
-                <div class="kpi-item">
-                    <div class="kpi-value">26</div>
-                    <div class="kpi-label">Distribuidoras</div>
-                </div>
-                <div class="kpi-item">
-                    <div class="kpi-value">44</div>
-                    <div class="kpi-label">Autos</div>
-                </div>
-                <div class="kpi-item" style="border-top-color: #059669;">
-                    <div class="kpi-value" style="color: #059669;">R$ 278,1</div>
-                    <div class="kpi-label">Multas (Mi)</div>
-                </div>
-                <div class="kpi-item" style="border-top-color: #F37021;">
-                    <div class="kpi-value" style="color: #F37021;">2020</div>
-                    <div class="kpi-label">Pico (14 Autos)</div>
-                </div>
-            </div>
-        </div>
-
-        <div style="padding: 0 2rem 2rem 2rem; overflow-x: auto;">
-            <table class="exec-table">
-                <thead>
-                    <tr>
-                        <th colspan="2" style="text-align: left;">Distribuidora / Grupo</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2018</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2019</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2020</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2022</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2024</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2025</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th style="background: #005596; color: white;">Total</th>
-                        <th style="background: #005596; color: white;">Valor (R$ Mi)</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody-dist"></tbody>
-            </table>
-        </div>
-
-        <div class="legend-row">
-            <div class="legend-item">
-                <span class="legend-badge">Qtd</span>
-                <span>Quantidade de Autos de Infração</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-badge" style="background: rgba(5,150,105,0.1); color: #059669;">R$</span>
-                <span>Valor de Penalidade Imposta (milhões)</span>
-            </div>
-        </div>
-
-        <!-- INSIGHTS DISTRIBUIDORAS -->
-        <div style="padding: 2rem; background: #f9f9f9; border-top: 1px solid #e5e7eb;">
-            <h4 style="font-size: 13px; font-weight: 800; color: #005596; text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
-                <svg style="width:16px;height:16px" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A7,7 0 0,0 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H15A1,1 0 0,0 16,17V14.74C17.81,13.47 19,11.38 19,9A7,7 0 0,0 12,2M9,21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9V21Z"/></svg>
-                Insights - Distribuidoras
-            </h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
-                <div style="font-size: 11px; line-height: 1.5; color: #333;">
-                    <strong style="display: block; color: #005596; margin-bottom: 6px; font-size: 12px;">🎯 Maior Exposição</strong>
-                    RGE Sul lidera com R$ 40,2M em penalidades (14,5% do total). Concentração em operações de acesso ao sistema (ligação com obra).
-                </div>
-                <div style="font-size: 11px; line-height: 1.5; color: #333;">
-                    <strong style="display: block; color: #005596; margin-bottom: 6px; font-size: 12px;">⚠️ Padrão de Risco</strong>
-                    ENEL (5 dist.) acumula R$ 83,8M. Indicativo de falhas sistêmicas em conformidade operacional. Exige auditoria estratégica.
-                </div>
-                <div style="font-size: 11px; line-height: 1.5; color: #333;">
-                    <strong style="display: block; color: #005596; margin-bottom: 6px; font-size: 12px;">✅ Melhor Desempenho</strong>
-                    Distribuidoras menores (DEMEI, Nova Palma) com zero/mínimas penalidades. Sugerem operações mais ágeis e conformes.
-                </div>
-                <div style="font-size: 11px; line-height: 1.5; color: #333;">
-                    <strong style="display: block; color: #F37021; margin-bottom: 6px; font-size: 12px;">📊 ENERGISA Destaque</strong>
-                    9 distribuidoras com apenas R$ 9,7M em multas (3,5%). Taxa média de R$ 1,08M/distribuidor - 62% abaixo da média geral.
-                </div>
-            </div>
-        </div>
+<!-- ALERTAS -->
+<div class="mb-5">
+    <div class="alert alert-red">
+        <span style="font-size:15px;flex-shrink:0;">🔴</span>
+        <div><strong>RISCO CRÍTICO:</strong> ENEL SP (Eletropaulo) acumula R$ 330,0 Mi em penalidades — maior exposição individual. Novo auto em análise em 2026.</div>
     </div>
-
-    <!-- ============================================================ -->
-    <!-- TABELA 2: GRUPOS ECONÔMICOS -->
-    <!-- ============================================================ -->
-    <div class="card !p-0 overflow-hidden">
-        <div class="section-hero">
-            <h3>🏢 TABELA 2: AUTOS DE INFRAÇÃO POR GRUPO ECONÔMICO</h3>
-            <p>14 holdings | Consolidado | Análise de concentração regulatória</p>
-        </div>
-
-        <div style="padding: 1.5rem 2rem;">
-            <div class="kpi-header">
-                <div class="kpi-item">
-                    <div class="kpi-value">14</div>
-                    <div class="kpi-label">Grupos</div>
-                </div>
-                <div class="kpi-item">
-                    <div class="kpi-value">26</div>
-                    <div class="kpi-label">Distribuidoras</div>
-                </div>
-                <div class="kpi-item" style="border-top-color: #059669;">
-                    <div class="kpi-value" style="color: #059669;">44</div>
-                    <div class="kpi-label">Autos</div>
-                </div>
-                <div class="kpi-item" style="border-top-color: #F37021;">
-                    <div class="kpi-value" style="color: #F37021;">30,1%</div>
-                    <div class="kpi-label">ENEL Share</div>
-                </div>
-            </div>
-        </div>
-
-        <div style="padding: 0 2rem 2rem 2rem; overflow-x: auto;">
-            <table class="exec-table">
-                <thead>
-                    <tr>
-                        <th colspan="2" style="text-align: left;">Grupo Econômico</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2018</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2019</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2020</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2022</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2024</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th colspan="2" class="year-header"><span class="year-sub">2025</span><br/>Qtd | Valor (R$ Mi)</th>
-                        <th style="background: #005596; color: white;">Total</th>
-                        <th style="background: #005596; color: white;">Valor (R$ Mi)</th>
-                        <th style="background: #005596; color: white;">% Share</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody-grupos"></tbody>
-            </table>
-        </div>
-
-        <div class="legend-row">
-            <div class="legend-item">
-                <span class="legend-badge">Qtd</span>
-                <span>Quantidade de Autos por Grupo</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-badge" style="background: rgba(5,150,105,0.1); color: #059669;">R$</span>
-                <span>Total de Multas Impostas (milhões)</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-badge" style="background: rgba(243,112,33,0.1); color: #F37021;">%</span>
-                <span>Participação no Total de Multas</span>
-            </div>
-        </div>
-
-        <!-- INSIGHTS GRUPOS -->
-        <div style="padding: 2rem; background: #f9f9f9; border-top: 1px solid #e5e7eb;">
-            <h4 style="font-size: 13px; font-weight: 800; color: #005596; text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
-                <span>💡</span> Insights - Grupos Econômicos
-            </h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
-                <div style="font-size: 11px; line-height: 1.5; color: #333;">
-                    <strong style="display: block; color: #005596; margin-bottom: 6px; font-size: 12px;">🏢 Dominância ENEL</strong>
-                    ENEL lidera com 30,1% do total (R$ 83,8M). 4 autos concentrados em 2020. Indica período crítico de desempenho operacional.
-                </div>
-                <div style="font-size: 11px; line-height: 1.5; color: #333;">
-                    <strong style="display: block; color: #005596; margin-bottom: 6px; font-size: 12px;">📈 Concentração Severa</strong>
-                    Top 3 grupos (ENEL, EQUATORIAL, CPFL) representam 72,5% de todas as penalidades. Mercado altamente concentrado em grandes players.
-                </div>
-                <div style="font-size: 11px; line-height: 1.5; color: #333;">
-                    <strong style="display: block; color: #005596; margin-bottom: 6px; font-size: 12px;">⚖️ Volatilidade Temporal</strong>
-                    EQUATORIAL com padrão distribuído (2019, 2022, 2024, 2025). CPFL concentrado em 2020. Estratégias regulatórias distintas por grupo.
-                </div>
-                <div style="font-size: 11px; line-height: 1.5; color: #333;">
-                    <strong style="display: block; color: #F37021; margin-bottom: 6px; font-size: 12px;">🚀 ENERGISA Oportunidade</strong>
-                    Com 9 distribuidoras, representa apenas 3,5% das penalidades. Demonstra melhor governança operacional. Pode servir de benchmark interno.
-                </div>
-                <div style="font-size: 11px; line-height: 1.5; color: #333;">
-                    <strong style="display: block; color: #059669; margin-bottom: 6px; font-size: 12px;">💰 Eficiência Relativa</strong>
-                    Grupos pequenos (SULGIPE, CHESP, NOVA PALMA) com zero/mínimas multas. Sugerem que menor complexidade = melhor compliance.
-                </div>
-                <div style="font-size: 11px; line-height: 1.5; color: #333;">
-                    <strong style="display: block; color: #005596; margin-bottom: 6px; font-size: 12px;">🎯 Recomendação</strong>
-                    Investigar "boas práticas" de ENERGISA e grupos pequenos. Aplicar metodologia em operações ENEL/EQUATORIAL para reduzir exposição.
-                </div>
-            </div>
-        </div>
+    <div class="alert alert-orange">
+        <span style="font-size:15px;flex-shrink:0;">🟡</span>
+        <div><strong>2026 — EM PROCESSO:</strong> 6 distribuidoras (CEEE-D, ENEL SP, Equatorial AL, Light RJ, CEMIG-D, ENEL RJ) tiveram fiscalizações insatisfatórias. Penalidades ainda não definidas.</div>
     </div>
-
-    <!-- CONCLUSÕES ESTRATÉGICAS -->
-    <div class="card" style="background: linear-gradient(135deg, #f0f7ff 0%, #fff 100%); border-left: 8px solid #005596;">
-        <h2 class="text-xl font-black mb-6" style="color: #005596;">⚖️ ANÁLISE REGULATÓRIA E CONFORMIDADE</h2>
-        
-        <div class="insight-grid">
-            <div class="insight-card">
-                <div class="insight-value">30,1%</div>
-                <div class="insight-label">Market Share ENEL</div>
-                <p style="font-size: 11px; color: #666; margin-top: 8px;">5 distribuidoras | R$ 83,8M em penalidades | Maior exposição regulatória</p>
-            </div>
-            
-            <div class="insight-card">
-                <div class="insight-value">44,8%</div>
-                <div class="insight-label">Concentração Top 3</div>
-                <p style="font-size: 11px; color: #666; margin-top: 8px;">RGE Sul (40,2M) + ELETROPAULO (38,5M) + ENEL CE (26,3M)</p>
-            </div>
-            
-            <div class="insight-card" style="border-top-color: #F37021;">
-                <div class="insight-value" style="color: #F37021;">3,5%</div>
-                <div class="insight-label">ENERGISA Share</div>
-                <p style="font-size: 11px; color: #666; margin-top: 8px;">9 distribuidoras | R$ 9,7M | Melhor perfil de conformidade</p>
-            </div>
-            
-            <div class="insight-card">
-                <div class="insight-value">32%</div>
-                <div class="insight-label">Concentração 2020</div>
-                <p style="font-size: 11px; color: #666; margin-top: 8px;">14 autos de infração | Ano crítico de fiscalização ANEEL</p>
-            </div>
-        </div>
-
-        <div style="margin-top: 2rem; padding: 1.5rem; background: white; border-radius: 6px; border-left: 4px solid #F37021;">
-            <p style="font-size: 12px; line-height: 1.6; color: #333; margin: 0;">
-                <strong style="color: #F37021; font-size: 13px;">⚠️ RECOMENDAÇÃO EXECUTIVA:</strong><br/>
-                A distribuição de autos de infração é altamente concentrada em 3 players principais (44,8% das penalidades). A ANEEL apresenta padrão cíclico de fiscalização, com pico em 2020. A Energisa mantém perfil de conformidade superior (3,5% das penalidades para 9 distribuidoras), indicando processos operacionais mais alinhados com normas regulatórias. Recomenda-se análise das divergências nas categorias de autuação para cada grupo como benchmarking.
-            </p>
-        </div>
+    <div class="alert alert-green">
+        <span style="font-size:15px;flex-shrink:0;">🟢</span>
+        <div><strong>PERFORMANCE ENERGISA:</strong> 10 autos em 8 distribuidoras. Menor exposição relativa ao número de concessões. Referência positiva de conformidade.</div>
     </div>
-
-    <!-- FOOTER -->
-    <div class="card border border-gray-200" style="background: #f9f9f9; text-align: center;">
-        <button onclick="window.print()" class="no-print px-8 py-2 rounded font-bold text-sm mb-4" style="background: #005596; color: white; cursor: pointer; border: none;">🖨️ IMPRIMIR RELATÓRIO</button>
-        <p class="text-xs text-gray-500">Fonte: ANEEL | Autos de Infração (2018-2026) | Valores em R$ milhões | Confidencial</p>
-    </div>
-
 </div>
 
+<!-- TABELA 1: DISTRIBUIDORAS -->
+<div class="card !p-0 overflow-hidden">
+    <div class="sec-hero">
+        <h3>📊 TABELA 1 — AUTOS DE INFRAÇÃO POR DISTRIBUIDORA</h3>
+        <p>38 distribuidoras | 78 autos (2018–2025) + processos em análise (2026) | Ordenado por maior valor</p>
+    </div>
+    <div style="padding:1rem 1.5rem;">
+        <div class="kpi-grid">
+            <div class="kpi-item">
+                <div class="kpi-val">38</div>
+                <div class="kpi-lbl">Distribuidoras</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-val">78</div>
+                <div class="kpi-lbl">Autos Lavrados</div>
+            </div>
+            <div class="kpi-item" style="border-top-color:#059669;">
+                <div class="kpi-val" style="color:#059669;">R$ 1.271,7</div>
+                <div class="kpi-lbl">Penalidades (Mi)</div>
+            </div>
+            <div class="kpi-item" style="border-top-color:#F37021;">
+                <div class="kpi-val" style="color:#F37021;">6</div>
+                <div class="kpi-lbl">Em Análise 2026</div>
+            </div>
+        </div>
+    </div>
+    <div style="padding:0 1.5rem 1.5rem; overflow-x:auto;">
+        <table class="exec-table">
+            <thead>
+                <tr>
+                    <th style="text-align:left;">Distribuidora</th>
+                    <th style="text-align:left;">Grupo</th>
+                    <th class="yr" colspan="2"><small>2018</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2"><small>2019</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2"><small>2020</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2"><small>2022</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2"><small>2024</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2"><small>2025</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2" style="background:linear-gradient(135deg,#F37021,#c85c0d);"><small>2026</small>Qtd | R$ Mi</th>
+                    <th>Total</th>
+                    <th>R$ (Mi)</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-dist"></tbody>
+        </table>
+    </div>
+    <div class="ins-sec">
+        <h4 style="font-size:11px;font-weight:800;color:#005596;text-transform:uppercase;margin-bottom:.8rem;">💡 Insights — Distribuidoras</h4>
+        <div class="ins-grid">
+            <div class="ins-item">
+                <strong>🎯 Maior Exposição</strong>
+                ENEL SP (Eletropaulo): R$ 330,0 Mi acumulados. Padrão persistente de autuações de 2018 a 2025, com novo processo aberto em 2026.
+            </div>
+            <div class="ins-item">
+                <strong>⚠️ Concentração</strong>
+                Top 5 distribuidoras concentram &gt;60% das penalidades. Exposição regulatória altamente assimétrica.
+            </div>
+            <div class="ins-item">
+                <strong>📈 Pico 2025</strong>
+                Ano com maior volume de penalidades. CELG-D, Equatorial GO e Light RJ responderam por grande parte das multas.
+            </div>
+            <div class="ins-item alert26">
+                <strong>⚠️ 2026 — Em Processo de Penalidade</strong>
+                6 distribuidoras tiveram fiscalizações com resultado insatisfatório: CEEE-D, ENEL SP, Equatorial AL, Light RJ, CEMIG-D e ENEL RJ. Processos em análise pela ANEEL. Valores a definir.
+            </div>
+            <div class="ins-item">
+                <strong>✅ Menor Exposição</strong>
+                DEMEI, CHESP, Nova Palma e Sulgipe com penalidades mínimas. Boa aderência regulatória.
+            </div>
+            <div class="ins-item">
+                <strong>📊 ENERGISA</strong>
+                10 autos em múltiplas distribuidoras. EMT concentra a maior penalidade do grupo (R$ 45,7Mi). Demais com baixa exposição individual.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TABELA 2: GRUPOS -->
+<div class="card !p-0 overflow-hidden">
+    <div class="sec-hero">
+        <h3>🏢 TABELA 2 — AUTOS DE INFRAÇÃO POR GRUPO ECONÔMICO</h3>
+        <p>14 grupos consolidados | Ordenado por maior valor | Empresas sem grupo = OUTROS</p>
+    </div>
+    <div style="padding:1rem 1.5rem;">
+        <div class="kpi-grid">
+            <div class="kpi-item">
+                <div class="kpi-val">14</div>
+                <div class="kpi-lbl">Grupos</div>
+            </div>
+            <div class="kpi-item">
+                <div class="kpi-val">78</div>
+                <div class="kpi-lbl">Autos Lavrados</div>
+            </div>
+            <div class="kpi-item" style="border-top-color:#059669;">
+                <div class="kpi-val" style="color:#059669;">R$ 1.271,7</div>
+                <div class="kpi-lbl">Penalidades (Mi)</div>
+            </div>
+            <div class="kpi-item" style="border-top-color:#F37021;">
+                <div class="kpi-val" style="color:#F37021;">5</div>
+                <div class="kpi-lbl">Grupos c/ 2026</div>
+            </div>
+        </div>
+    </div>
+    <div style="padding:0 1.5rem 1.5rem; overflow-x:auto;">
+        <table class="exec-table">
+            <thead>
+                <tr>
+                    <th style="text-align:left;" colspan="2">Grupo Econômico</th>
+                    <th class="yr" colspan="2"><small>2018</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2"><small>2019</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2"><small>2020</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2"><small>2022</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2"><small>2024</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2"><small>2025</small>Qtd | R$ Mi</th>
+                    <th class="yr" colspan="2" style="background:linear-gradient(135deg,#F37021,#c85c0d);"><small>2026</small>Qtd | R$ Mi</th>
+                    <th>Total</th>
+                    <th>R$ (Mi)</th>
+                    <th>%</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-grupos"></tbody>
+        </table>
+    </div>
+    <div class="ins-sec">
+        <h4 style="font-size:11px;font-weight:800;color:#005596;text-transform:uppercase;margin-bottom:.8rem;">💡 Insights — Grupos Econômicos</h4>
+        <div class="ins-grid">
+            <div class="ins-item">
+                <strong>🏢 Maior Exposição</strong>
+                ENEL lidera com R$ 491,8 Mi (38,7% do total). Concentração em ENEL SP (Eletropaulo) como principal fonte de penalidades.
+            </div>
+            <div class="ins-item">
+                <strong>📈 Concentração</strong>
+                Top 3 grupos (ENEL, EQUATORIAL, CPFL) respondem por mais de 75% de todas as penalidades.
+            </div>
+            <div class="ins-item">
+                <strong>⚖️ Pico 2025</strong>
+                EQUATORIAL e ENEL com maior volume em 2025. Padrão de fiscalização intensiva nos grandes grupos.
+            </div>
+            <div class="ins-item alert26">
+                <strong>⚠️ 2026 — Penalidades em Análise</strong>
+                5 grupos (ENEL, EQUATORIAL, LIGHT, CEMIG, NEOENERGIA) possuem processos abertos após fiscalizações com resultado insatisfatório. Valores ainda não definidos pela ANEEL.
+            </div>
+            <div class="ins-item">
+                <strong>🚀 ENERGISA</strong>
+                R$ 60,8 Mi em 10 autos. Melhor relação penalidade/distribuidor entre os grandes grupos. Referência de conformidade operacional.
+            </div>
+            <div class="ins-item">
+                <strong>🎯 Estratégia</strong>
+                Monitorar evolução dos processos 2026. Implementar planos de remediação nos grupos com maior recorrência de autuações.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div class="card border border-gray-200" style="background:#f9f9f9;text-align:center;">
+    <button onclick="window.print()" class="no-print px-6 py-2 rounded font-bold text-xs mb-3"
+        style="background:#005596;color:white;cursor:pointer;border:none;">🖨️ IMPRIMIR</button>
+    <p class="text-xs text-gray-500">Fonte: ANEEL | Autos 2018–2025 | 2026: processos em análise | Valores em R$ Mi | Confidencial</p>
+</div>
+
+</div>
 <script>
-const distribuidoras = [
-    { nome: 'RGE Sul', grupo: 'CPFL', '2018': null, '2019': null, '2020': [1, 40.164063], '2022': null, '2024': null, '2025': null },
-    { nome: 'ENEL SP (ELETROPAULO)', grupo: 'ENEL', '2018': [1, 38.526686], '2019': null, '2020': null, '2022': null, '2024': null, '2025': null },
-    { nome: 'Equatorial RS', grupo: 'EQUATORIAL', '2018': null, '2019': [1, 1.148082], '2020': null, '2022': [1, 3.452604], '2024': [1, 30.042612], '2025': [1, 0] },
-    { nome: 'Equatorial MA', grupo: 'EQUATORIAL', '2018': null, '2019': null, '2020': null, '2022': [1, 27.4532], '2024': null, '2025': null },
-    { nome: 'ENEL Ceará', grupo: 'ENEL', '2018': [1, 0.260278], '2019': null, '2020': [1, 26.019275], '2022': null, '2024': null, '2025': null },
-    { nome: 'Light RJ', grupo: 'LIGHT', '2018': null, '2019': null, '2020': [2, 21.981843], '2022': null, '2024': null, '2025': null },
-    { nome: 'CELESC', grupo: 'CELESC', '2018': null, '2019': [1, 3.379013], '2020': [1, 13.996524], '2022': null, '2024': null, '2025': null },
-    { nome: 'CEMIG', grupo: 'CEMIG', '2018': [1, 15.075127], '2019': null, '2020': null, '2022': null, '2024': null, '2025': null },
-    { nome: 'Equatorial PI', grupo: 'EQUATORIAL', '2018': null, '2019': null, '2020': null, '2022': [1, 10.556488], '2024': null, '2025': null },
-    { nome: 'Neoenergia PE', grupo: 'NEOENERGIA', '2018': [1, 1.689893], '2019': null, '2020': [1, 7.90888], '2022': null, '2024': null, '2025': null },
-    { nome: 'ENERGISA MT', grupo: 'ENERGISA', '2018': null, '2019': null, '2020': [2, 8.421441], '2022': null, '2024': null, '2025': null },
-    { nome: 'ENEL RJ', grupo: 'ENEL', '2018': null, '2019': null, '2020': null, '2022': [1, 17.011037], '2024': null, '2025': null },
-    { nome: 'Neoenergia DF', grupo: 'NEOENERGIA', '2018': null, '2019': null, '2020': null, '2022': [1, 1.408462], '2024': null, '2025': null },
-    { nome: 'EDP ES', grupo: 'EDP', '2018': null, '2019': [1, 0.060363], '2020': [1, 3.708666], '2022': null, '2024': null, '2025': null },
-    { nome: 'CPFL Leste', grupo: 'CPFL', '2018': null, '2019': [1, 0.015115], '2020': null, '2022': null, '2024': null, '2025': null },
-    { nome: 'CPFL Sul', grupo: 'CPFL', '2018': null, '2019': [1, 0.04619], '2020': null, '2022': null, '2024': null, '2025': null },
-    { nome: 'CPFL Jaguari', grupo: 'CPFL', '2018': [1, 0], '2019': null, '2020': null, '2022': null, '2024': null, '2025': null },
-    { nome: 'CPFL Piratininga', grupo: 'CPFL', '2018': [1, 0], '2019': null, '2020': null, '2022': null, '2024': null, '2025': null },
-    { nome: 'ENERGISA MS', grupo: 'ENERGISA', '2018': null, '2019': [1, 0.813956], '2020': null, '2022': null, '2024': null, '2025': null },
-    { nome: 'ENERGISA MR', grupo: 'ENERGISA', '2018': null, '2019': null, '2020': null, '2022': [1, 2.456218], '2024': null, '2025': null },
-    { nome: 'ENERGISA SS', grupo: 'ENERGISA', '2018': null, '2019': [1, 0.546585], '2020': null, '2022': null, '2024': null, '2025': null },
-    { nome: 'COPEL', grupo: 'COPEL', '2018': null, '2019': null, '2020': [1, 1.911211], '2022': null, '2024': null, '2025': null },
-    { nome: 'Sulgipe', grupo: 'SULGIPE', '2018': null, '2019': null, '2020': [1, 0.011668], '2022': null, '2024': null, '2025': null },
-    { nome: 'CHESP', grupo: 'CHESP', '2018': null, '2019': [1, 0.004563], '2020': null, '2022': null, '2024': null, '2025': null },
-    { nome: 'DEMEI', grupo: 'PERMISSIONÁRIA', '2018': null, '2019': [1, 0.000114], '2020': null, '2022': null, '2024': null, '2025': null },
-    { nome: 'Nova Palma', grupo: 'NOVA PALMA', '2018': null, '2019': null, '2020': [1, 0], '2022': null, '2024': null, '2025': null }
-];
+const ANOS = ['2018','2019','2020','2022','2024','2025','2026'];
 
-const grupos = [
-    // ENEL: ELETROPAULO (38.526686) + ENEL CE (0.260278 + 26.019275) + ENEL RJ (17.011037)
-    { nome: 'ENEL', qtd: 5, '2018': [1, 38.786964], '2019': null, '2020': [1, 26.019275], '2022': [1, 17.011037], '2024': null, '2025': null },
-    
-    // EQUATORIAL: Eq RS (1.148082 + 3.452604 + 30.042612 + 0) + Eq MA (27.4532) + Eq PI (10.556488)
-    { nome: 'EQUATORIAL', qtd: 4, '2018': null, '2019': [1, 1.148082], '2020': null, '2022': [3, 41.462292], '2024': [1, 30.042612], '2025': [1, 0] },
-    
-    // CPFL: RGE Sul (40.164063) + CPFL Leste (0.015115) + CPFL Sul (0.04619) + CPFL Jaguari (0) + CPFL Piratininga (0)
-    { nome: 'CPFL', qtd: 6, '2018': [2, 0], '2019': [2, 0.061305], '2020': [1, 40.164063], '2022': null, '2024': null, '2025': null },
-    
-    // NEOENERGIA: Neoenergia PE (1.689893 + 7.90888) + Neoenergia DF (1.408462)
-    { nome: 'NEOENERGIA', qtd: 3, '2018': [1, 1.689893], '2019': null, '2020': [1, 7.90888], '2022': [1, 1.408462], '2024': null, '2025': null },
-    
-    // ENERGISA: ENERGISA MT (8.421441) + ENERGISA MS (0.813956) + ENERGISA SS (0.546585) + ENERGISA MR (2.456218)
-    { nome: 'ENERGISA', qtd: 9, '2018': null, '2019': [2, 1.360541], '2020': [2, 8.421441], '2022': [1, 2.456218], '2024': null, '2025': null },
-    
-    // EDP: EDP ES (0.060363 + 3.708666)
-    { nome: 'EDP', qtd: 2, '2018': null, '2019': [1, 0.060363], '2020': [1, 3.708666], '2022': null, '2024': null, '2025': null },
-    
-    // LIGHT: Light RJ (2 + 21.981843)
-    { nome: 'LIGHT', qtd: 1, '2018': null, '2019': null, '2020': [2, 21.981843], '2022': null, '2024': null, '2025': null },
-    
-    // COPEL: COPEL (1.911211)
-    { nome: 'COPEL', qtd: 1, '2018': null, '2019': null, '2020': [1, 1.911211], '2022': null, '2024': null, '2025': null },
-    
-    // CELESC: CELESC (3.379013 + 13.996524)
-    { nome: 'CELESC', qtd: 1, '2018': null, '2019': [1, 3.379013], '2020': [1, 13.996524], '2022': null, '2024': null, '2025': null },
-    
-    // CEMIG: CEMIG (15.075127)
-    { nome: 'CEMIG', qtd: 1, '2018': [1, 15.075127], '2019': null, '2020': null, '2022': null, '2024': null, '2025': null },
-    
-    // CHESP: CHESP (0.004563)
-    { nome: 'CHESP', qtd: 1, '2018': null, '2019': [1, 0.004563], '2020': null, '2022': null, '2024': null, '2025': null },
-    
-    // SULGIPE: Sulgipe (0.011668)
-    { nome: 'SULGIPE', qtd: 1, '2018': null, '2019': null, '2020': [1, 0.011668], '2022': null, '2024': null, '2025': null },
-    
-    // NOVA PALMA: Nova Palma (0)
-    { nome: 'NOVA PALMA', qtd: 1, '2018': null, '2019': null, '2020': [1, 0], '2022': null, '2024': null, '2025': null },
-    
-    // PERMISSIONÁRIA: DEMEI (0.000114)
-    { nome: 'PERMISSIONÁRIA', qtd: 1, '2018': null, '2019': [1, 0.000114], '2020': null, '2022': null, '2024': null, '2025': null }
-];
+const distribuidoras = [{"nome": "ENEL SP (Eletropaulo)", "grupo": "ENEL", "2018": [1, 38.526687], "2019": null, "2020": [1, 13.512333], "2022": [2, 112.118091], "2024": null, "2025": [2, 165.807883], "2026": [1, 0.0]}, {"nome": "Equatorial GO", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": null, "2025": [3, 123.358121], "2026": null}, {"nome": "CELG-D", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 7.915238], "2020": [1, 44.171531], "2022": null, "2024": null, "2025": [2, 72.479756], "2026": null}, {"nome": "ENEL RJ (Ampla)", "grupo": "ENEL", "2018": null, "2019": null, "2020": null, "2022": [1, 17.011037], "2024": null, "2025": [1, 54.054199], "2026": [1, 0.0]}, {"nome": "Light RJ", "grupo": "LIGHT", "2018": null, "2019": null, "2020": [2, 21.981843], "2022": null, "2024": null, "2025": [3, 56.788565], "2026": [1, 0.0]}, {"nome": "ENEL CE", "grupo": "ENEL", "2018": [1, 0.260279], "2019": null, "2020": [1, 26.019275], "2022": [1, 35.916136], "2024": [1, 28.550163], "2025": null, "2026": null}, {"nome": "Equatorial RS (CEEE-D)", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 1.148082], "2020": null, "2022": [1, 3.452604], "2024": [2, 54.345234], "2025": [2, 0.0], "2026": [1, 0.0]}, {"nome": "Equatorial MA", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 0.298888], "2020": null, "2022": [1, 27.453201], "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Paulista", "grupo": "CPFL", "2018": null, "2019": null, "2020": null, "2022": [1, 9.95248], "2024": [1, 48.277709], "2025": null, "2026": null}, {"nome": "RGE Sul", "grupo": "CPFL", "2018": null, "2019": null, "2020": [1, 40.164063], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia PE (CELPE)", "grupo": "NEOENERGIA", "2018": [1, 1.689893], "2019": [1, 2.925092], "2020": [1, 7.90888], "2022": null, "2024": [1, 32.949775], "2025": null, "2026": null}, {"nome": "Neoenergia BA (COELBA)", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 24.089829], "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia Elektro", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 22.472278], "2024": null, "2025": null, "2026": null}, {"nome": "CELESC", "grupo": "CELESC", "2018": null, "2019": [1, 3.379013], "2020": [1, 13.996524], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CEMIG-D", "grupo": "CEMIG", "2018": [1, 15.075127], "2019": null, "2020": null, "2022": null, "2024": null, "2025": [3, 0.0], "2026": [1, 0.0]}, {"nome": "EDP SP", "grupo": "EDP", "2018": null, "2019": null, "2020": null, "2022": [1, 18.111882], "2024": [1, 16.021419], "2025": null, "2026": null}, {"nome": "ENERGISA MT (EMT)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": [2, 8.421441], "2022": null, "2024": [1, 37.280176], "2025": null, "2026": null}, {"nome": "Equatorial AL", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [3, 14.134885], "2025": [1, 0.0], "2026": [1, 0.0]}, {"nome": "Equatorial PI", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 10.556488], "2025": null, "2026": null}, {"nome": "COPEL-DIS", "grupo": "COPEL", "2018": null, "2019": null, "2020": [1, 1.911211], "2022": null, "2024": [1, 6.386919], "2025": [1, 0.0], "2026": null}, {"nome": "CEA", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 8.343522], "2025": null, "2026": null}, {"nome": "EDP ES", "grupo": "EDP", "2018": null, "2019": [1, 0.060363], "2020": [1, 3.708667], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA MS (EMS)", "grupo": "ENERGISA", "2018": null, "2019": [1, 0.813956], "2020": [1, 1.749501], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA MR (EMR)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": [1, 2.456218], "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA TO (ETO)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": [1, 3.416596], "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA RO (CERON)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 4.443841], "2025": null, "2026": null}, {"nome": "CELPA", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 2.156657], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Leste Paulista", "grupo": "CPFL", "2018": null, "2019": [1, 0.015116], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Sul Paulista", "grupo": "CPFL", "2018": null, "2019": [1, 0.046191], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Jaguari", "grupo": "CPFL", "2018": [1, 0.0], "2019": null, "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Piratininga", "grupo": "CPFL", "2018": [1, 0.0], "2019": null, "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia DF (CEB)", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 1.408462], "2024": null, "2025": [2, 0.0], "2026": null}, {"nome": "ENERGISA SS (ESS)", "grupo": "ENERGISA", "2018": null, "2019": [1, 0.546585], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA SE (ESE)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": null, "2024": null, "2025": [1, 1.68761], "2026": null}, {"nome": "Sulgipe", "grupo": "SULGIPE", "2018": null, "2019": null, "2020": [1, 0.011668], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CHESP", "grupo": "CHESP", "2018": null, "2019": [1, 0.004563], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "DEMEI", "grupo": "DEMEI", "2018": null, "2019": [1, 0.000115], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Nova Palma Energia", "grupo": "NOVA PALMA", "2018": null, "2019": null, "2020": [1, 0.0], "2022": null, "2024": null, "2025": null, "2026": null}];
+const grupos = [{"nome": "ENEL", "2018": [2, 38.786966], "2019": null, "2020": [2, 39.531608], "2022": [4, 165.045264], "2024": [1, 28.550163], "2025": [3, 219.862082], "2026": [2, 0.0]}, {"nome": "EQUATORIAL", "2018": null, "2019": [4, 11.518865], "2020": [1, 44.171531], "2022": [2, 30.905805], "2024": [7, 87.380129], "2025": [8, 195.837877], "2026": [2, 0.0]}, {"nome": "LIGHT", "2018": null, "2019": null, "2020": [2, 21.981843], "2022": null, "2024": null, "2025": [3, 56.788565], "2026": [1, 0.0]}, {"nome": "CPFL", "2018": [2, 0.0], "2019": [2, 0.061307], "2020": [1, 40.164063], "2022": [1, 9.95248], "2024": [1, 48.277709], "2025": null, "2026": null}, {"nome": "NEOENERGIA", "2018": [1, 1.689893], "2019": [1, 2.925092], "2020": [1, 7.90888], "2022": [3, 47.970569], "2024": [1, 32.949775], "2025": [2, 0.0], "2026": null}, {"nome": "CELESC", "2018": null, "2019": [1, 3.379013], "2020": [1, 13.996524], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CEMIG", "2018": [1, 15.075127], "2019": null, "2020": null, "2022": null, "2024": null, "2025": [3, 0.0], "2026": [1, 0.0]}, {"nome": "EDP", "2018": null, "2019": [1, 0.060363], "2020": [1, 3.708667], "2022": [1, 18.111882], "2024": [1, 16.021419], "2025": null, "2026": null}, {"nome": "ENERGISA", "2018": null, "2019": [2, 1.360541], "2020": [3, 10.170942], "2022": [2, 5.872814], "2024": [2, 41.724017], "2025": [1, 1.68761], "2026": null}, {"nome": "COPEL", "2018": null, "2019": null, "2020": [1, 1.911211], "2022": null, "2024": [1, 6.386919], "2025": [1, 0.0], "2026": null}, {"nome": "SULGIPE", "2018": null, "2019": null, "2020": [1, 0.011668], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CHESP", "2018": null, "2019": [1, 0.004563], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "DEMEI", "2018": null, "2019": [1, 0.000115], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "NOVA PALMA", "2018": null, "2019": null, "2020": [1, 0.0], "2022": null, "2024": null, "2025": null, "2026": null}];
 
-function fmt(v) { return v === null || v === 0 ? '—' : v.toFixed(1); }
+function fmt(v) {
+    if (v === null || v === undefined || v === 0) return '—';
+    return v.toFixed(1);
+}
+
+function cellQty(d, ano) {
+    if (!d[ano]) return '<td class="col-qty">—</td>';
+    const cls = ano === '2026' ? 'col-qty q26' : 'col-qty';
+    return `<td class="${cls}">${d[ano][0]}</td>`;
+}
+
+function cellVal(d, ano) {
+    if (!d[ano]) return '<td class="col-val">—</td>';
+    if (ano === '2026') return '<td class="col-val v26">Em análise</td>';
+    if (d[ano][1] === 0) return '<td class="col-val">—</td>';
+    return `<td class="col-val">${d[ano][1].toFixed(1)}</td>`;
+}
 
 function renderDist() {
     const tbody = document.getElementById('tbody-dist');
     const sorted = [...distribuidoras].sort((a,b) => {
-        let totalA = 0, totalB = 0;
-        ['2018','2019','2020','2022','2024','2025'].forEach(y => { if(a[y]) totalA += a[y][1]; if(b[y]) totalB += b[y][1]; });
-        return totalB - totalA;
+        let va=0, vb=0;
+        ['2018','2019','2020','2022','2024','2025'].forEach(y => { if(a[y]) va+=a[y][1]; if(b[y]) vb+=b[y][1]; });
+        return vb - va;
     });
-    
-    sorted.forEach((d, i) => {
-        let totalOps = 0, totalVlr = 0;
-        ['2018','2019','2020','2022','2024','2025'].forEach(y => { if(d[y]) { totalOps += d[y][0]; totalVlr += d[y][1]; } });
-        
+
+    let tOps=0, tVlr=0;
+    sorted.forEach(d => {
+        let ops=0, vlr=0;
+        ['2018','2019','2020','2022','2024','2025'].forEach(y => { if(d[y]) { ops+=d[y][0]; vlr+=d[y][1]; } });
+        const ops26 = d['2026'] ? d['2026'][0] : 0;
+        tOps+=ops; tVlr+=vlr;
+        const isEn = d.grupo === 'ENERGISA';
         const tr = document.createElement('tr');
-        tr.style.backgroundColor = i % 2 === 0 ? 'white' : '#f9f9f9';
-        if(d.grupo === 'ENERGISA') tr.style.borderLeft = '4px solid #F37021';
-        
+        if(isEn) tr.style.borderLeft = '3px solid #F37021';
         tr.innerHTML = `
-            <td class="name-col ${d.grupo === 'ENERGISA' ? 'energisa' : ''}">${d.nome}</td>
-            <td class="meta-col">${d.grupo}</td>
-            <td class="qty-cell">${d['2018'] ? d['2018'][0] : '—'}</td>
-            <td class="value-cell">${d['2018'] ? fmt(d['2018'][1]) : '—'}</td>
-            <td class="qty-cell">${d['2019'] ? d['2019'][0] : '—'}</td>
-            <td class="value-cell">${d['2019'] ? fmt(d['2019'][1]) : '—'}</td>
-            <td class="qty-cell">${d['2020'] ? d['2020'][0] : '—'}</td>
-            <td class="value-cell">${d['2020'] ? fmt(d['2020'][1]) : '—'}</td>
-            <td class="qty-cell">${d['2022'] ? d['2022'][0] : '—'}</td>
-            <td class="value-cell">${d['2022'] ? fmt(d['2022'][1]) : '—'}</td>
-            <td class="qty-cell">${d['2024'] ? d['2024'][0] : '—'}</td>
-            <td class="value-cell">${d['2024'] ? fmt(d['2024'][1]) : '—'}</td>
-            <td class="qty-cell">${d['2025'] ? d['2025'][0] : '—'}</td>
-            <td class="value-cell">${d['2025'] ? fmt(d['2025'][1]) : '—'}</td>
-            <td style="text-align:center; font-weight:700; color:#005596;">${totalOps || '—'}</td>
-            <td style="text-align:right; font-weight:700; color:#059669;">${fmt(totalVlr)}</td>
-        `;
+            <td class="col-name ${isEn?'en':''}">${d.nome}</td>
+            <td class="col-grupo">${d.grupo}</td>
+            ${cellQty(d,'2018')}${cellVal(d,'2018')}
+            ${cellQty(d,'2019')}${cellVal(d,'2019')}
+            ${cellQty(d,'2020')}${cellVal(d,'2020')}
+            ${cellQty(d,'2022')}${cellVal(d,'2022')}
+            ${cellQty(d,'2024')}${cellVal(d,'2024')}
+            ${cellQty(d,'2025')}${cellVal(d,'2025')}
+            ${cellQty(d,'2026')}${cellVal(d,'2026')}
+            <td class="col-tot-ops">${ops||'—'}</td>
+            <td class="col-tot-val">${vlr > 0 ? vlr.toFixed(1) : '—'}</td>`;
         tbody.appendChild(tr);
     });
-    
-    let totalOpsAll = 0, totalVlrAll = 0;
-    sorted.forEach(d => { ['2018','2019','2020','2022','2024','2025'].forEach(y => { if(d[y]) { totalOpsAll += d[y][0]; totalVlrAll += d[y][1]; } }); });
-    
+
     const tr = document.createElement('tr');
     tr.className = 'total-row';
-    tr.innerHTML = `
-        <td class="name-col">🔹 TOTAL</td>
-        <td></td>
-        <td colspan="12"></td>
-        <td style="text-align:center;">${totalOpsAll}</td>
-        <td style="text-align:right;">${fmt(totalVlrAll)}</td>
-    `;
+    tr.innerHTML = `<td class="col-name">🔹 TOTAL GERAL</td><td></td>
+        <td colspan="14"></td>
+        <td class="col-tot-ops">${tOps}</td>
+        <td class="col-tot-val">${tVlr.toFixed(1)}</td>`;
     tbody.appendChild(tr);
 }
 
 function renderGrupos() {
     const tbody = document.getElementById('tbody-grupos');
+    const totalVlrAll = grupos.reduce((s,g) => {
+        let v=0; ['2018','2019','2020','2022','2024','2025'].forEach(y=>{ if(g[y]) v+=g[y][1]; }); return s+v;
+    },0);
+
     const sorted = [...grupos].sort((a,b) => {
-        let totalA = 0, totalB = 0;
-        ['2018','2019','2020','2022','2024','2025'].forEach(y => { if(a[y]) totalA += a[y][1]; if(b[y]) totalB += b[y][1]; });
-        return totalB - totalA;
+        let va=0, vb=0;
+        ['2018','2019','2020','2022','2024','2025'].forEach(y => { if(a[y]) va+=a[y][1]; if(b[y]) vb+=b[y][1]; });
+        return vb - va;
     });
-    
-    const totalValorAll = grupos.reduce((s, g) => { let t = 0; ['2018','2019','2020','2022','2024','2025'].forEach(y => { if(g[y]) t += g[y][1]; }); return s + t; }, 0);
-    
-    sorted.forEach((g, i) => {
-        let totalOps = 0, totalVlr = 0;
-        ['2018','2019','2020','2022','2024','2025'].forEach(y => { if(g[y]) { totalOps += g[y][0]; totalVlr += g[y][1]; } });
-        
-        const sharePercent = ((totalVlr / totalValorAll) * 100).toFixed(1);
-        
+
+    let tOps=0, tVlr=0;
+    sorted.forEach(g => {
+        let ops=0, vlr=0;
+        ['2018','2019','2020','2022','2024','2025'].forEach(y => { if(g[y]) { ops+=g[y][0]; vlr+=g[y][1]; } });
+        tOps+=ops; tVlr+=vlr;
+        const pct = ((vlr/totalVlrAll)*100).toFixed(1);
+        const isEn = g.nome === 'ENERGISA';
         const tr = document.createElement('tr');
-        tr.style.backgroundColor = i % 2 === 0 ? 'white' : '#f9f9f9';
-        if(g.nome === 'ENERGISA') tr.style.borderLeft = '4px solid #F37021';
-        
+        if(isEn) tr.style.borderLeft = '3px solid #F37021';
         tr.innerHTML = `
-            <td class="name-col ${g.nome === 'ENERGISA' ? 'energisa' : ''}">${g.nome}</td>
-            <td style="text-align:center; font-weight:700; color:#005596;">${g.qtd}</td>
-            <td class="qty-cell">${g['2018'] ? g['2018'][0] : '—'}</td>
-            <td class="value-cell">${g['2018'] ? fmt(g['2018'][1]) : '—'}</td>
-            <td class="qty-cell">${g['2019'] ? g['2019'][0] : '—'}</td>
-            <td class="value-cell">${g['2019'] ? fmt(g['2019'][1]) : '—'}</td>
-            <td class="qty-cell">${g['2020'] ? g['2020'][0] : '—'}</td>
-            <td class="value-cell">${g['2020'] ? fmt(g['2020'][1]) : '—'}</td>
-            <td class="qty-cell">${g['2022'] ? g['2022'][0] : '—'}</td>
-            <td class="value-cell">${g['2022'] ? fmt(g['2022'][1]) : '—'}</td>
-            <td class="qty-cell">${g['2024'] ? g['2024'][0] : '—'}</td>
-            <td class="value-cell">${g['2024'] ? fmt(g['2024'][1]) : '—'}</td>
-            <td class="qty-cell">${g['2025'] ? g['2025'][0] : '—'}</td>
-            <td class="value-cell">${g['2025'] ? fmt(g['2025'][1]) : '—'}</td>
-            <td style="text-align:center; font-weight:700; color:#005596;">${totalOps || '—'}</td>
-            <td style="text-align:right; font-weight:700; color:#059669;">${fmt(totalVlr)}</td>
-            <td style="text-align:center; font-weight:700; color:#F37021;">${sharePercent}%</td>
-        `;
+            <td class="col-name ${isEn?'en':''}" colspan="2">${g.nome}</td>
+            ${cellQty(g,'2018')}${cellVal(g,'2018')}
+            ${cellQty(g,'2019')}${cellVal(g,'2019')}
+            ${cellQty(g,'2020')}${cellVal(g,'2020')}
+            ${cellQty(g,'2022')}${cellVal(g,'2022')}
+            ${cellQty(g,'2024')}${cellVal(g,'2024')}
+            ${cellQty(g,'2025')}${cellVal(g,'2025')}
+            ${cellQty(g,'2026')}${cellVal(g,'2026')}
+            <td class="col-tot-ops">${ops||'—'}</td>
+            <td class="col-tot-val">${vlr > 0 ? vlr.toFixed(1) : '—'}</td>
+            <td class="col-pct">${pct}%</td>`;
         tbody.appendChild(tr);
     });
-    
-    let totalOpsAll = 0, totalVlrAll = 0;
-    sorted.forEach(g => { ['2018','2019','2020','2022','2024','2025'].forEach(y => { if(g[y]) { totalOpsAll += g[y][0]; totalVlrAll += g[y][1]; } }); });
-    
+
     const tr = document.createElement('tr');
     tr.className = 'total-row';
-    tr.innerHTML = `
-        <td class="name-col">🔹 TOTAL</td>
-        <td style="text-align:center;">14</td>
-        <td colspan="12"></td>
-        <td style="text-align:center;">${totalOpsAll}</td>
-        <td style="text-align:right;">${fmt(totalVlrAll)}</td>
-        <td style="text-align:center;">100%</td>
-    `;
+    tr.innerHTML = `<td class="col-name" colspan="2">🔹 TOTAL GERAL</td>
+        <td colspan="14"></td>
+        <td class="col-tot-ops">${tOps}</td>
+        <td class="col-tot-val">${tVlr.toFixed(1)}</td>
+        <td class="col-pct">100%</td>`;
     tbody.appendChild(tr);
 }
 
 renderDist();
 renderGrupos();
 </script>
-
 </body>
 </html>
