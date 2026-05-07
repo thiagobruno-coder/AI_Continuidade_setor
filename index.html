@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Processos de Infração ANEEL - Energisa</title>
+    <title>Painel Regulatório Consolidado — Energisa</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
+
         :root { --blue: #005596; --orange: #F37021; --gray: #F2F2F2; }
         body { font-family: 'Open Sans', sans-serif; background: var(--gray); }
         .header-stripe { height: 8px; background: linear-gradient(90deg, #005596 70%, #F37021 70%); }
@@ -79,31 +81,129 @@
         .ins-item.alert26 strong { color: #F37021; }
 
         @media print { .no-print { display:none; } body { background:white; } .card { box-shadow:none; } }
+    
+
+        :root { --blue: #005596; --orange: #F37021; --gray: #F2F2F2; }
+        body { font-family: 'Open Sans', sans-serif; background: var(--gray); color: #333; }
+        .header-stripe { height: 8px; background: linear-gradient(90deg, #005596 70%, #F37021 70%); }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 2rem; }
+        
+        .exec-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .exec-table thead th {
+            background: #005596; color: white; padding: 10px 5px;
+            text-align: center; font-weight: 700; text-transform: uppercase; font-size: 9px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .exec-table thead th.yr { background: #003d6b; }
+        .exec-table thead th.yr-26 { background: #F37021; }
+        
+        .exec-table tbody tr { border-bottom: 1px solid #e5e7eb; transition: background .15s; }
+        .exec-table tbody tr:nth-child(even) { background: #f9f9f9; }
+        .exec-table tbody tr:hover { background: #e8f4ff !important; }
+        .exec-table td { padding: 8px 5px; text-align: center; border: 1px solid #eee; }
+        
+        .col-name { font-weight: 700; color: #005596; text-align: left !important; min-width: 150px; font-size: 10px; }
+        .col-grupo { color: #666; text-align: left !important; font-size: 8px; text-transform: uppercase; }
+        
+        .cell-trio { line-height: 1.6; }
+        .cell-num { display: block; font-size: 8.5px; color: #dc2626; font-weight: 700; }
+        .cell-den { display: block; font-size: 7.5px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 1px; }
+        .cell-pct { display: block; font-size: 9.5px; font-weight: 900; margin-top: 1px; }
+        .cell-pct.impact-high { color: #dc2626; }
+        .cell-pct.impact-mid { color: #d97706; }
+        .cell-pct.impact-low { color: #059669; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .kpi-item { background: white; padding: 1.5rem; border-radius: 8px; border-top: 4px solid var(--blue); text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .kpi-val { font-size: 24px; font-weight: 900; color: #005596; }
+        .kpi-lbl { font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-top: 5px; font-weight: 700; }
+    
+
+        :root { --blue: #005596; --orange: #F37021; --gray: #F2F2F2; }
+        body { font-family: 'Open Sans', sans-serif; background: var(--gray); color: #333; }
+        .header-stripe { height: 8px; background: linear-gradient(90deg, #005596 70%, #F37021 70%); }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 2rem; }
+        
+        .exec-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .exec-table thead th {
+            background: #005596; color: white; padding: 10px 5px;
+            text-align: center; font-weight: 700; text-transform: uppercase; font-size: 9px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .exec-table thead th.yr { background: #003d6b; }
+        .exec-table thead th.yr-26 { background: #F37021; }
+        
+        .exec-table tbody tr { border-bottom: 1px solid #e5e7eb; transition: background .15s; }
+        .exec-table tbody tr:nth-child(even) { background: #f9f9f9; }
+        .exec-table tbody tr:hover { background: #e8f4ff !important; }
+        .exec-table td { padding: 8px 5px; text-align: center; border: 1px solid #eee; }
+        
+        .col-name { font-weight: 700; color: #005596; text-align: left !important; min-width: 150px; font-size: 10px; }
+        .col-grupo { color: #666; text-align: left !important; font-size: 8px; text-transform: uppercase; }
+        
+        .cell-trio { line-height: 1.6; }
+        .cell-num { display: block; font-size: 8.5px; color: #dc2626; font-weight: 700; }
+        .cell-den { display: block; font-size: 7.5px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 1px; }
+        .cell-pct { display: block; font-size: 9.5px; font-weight: 900; margin-top: 1px; }
+        .cell-pct.impact-high { color: #dc2626; }
+        .cell-pct.impact-mid { color: #d97706; }
+        .cell-pct.impact-low { color: #059669; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .kpi-item { background: white; padding: 1.5rem; border-radius: 8px; border-top: 4px solid var(--blue); text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .kpi-val { font-size: 24px; font-weight: 900; color: #005596; }
+        .kpi-lbl { font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-top: 5px; font-weight: 700; }
+    
+
+/* ── TABS CONSOLIDADO ── */
+.tabs-nav { display:flex; gap:4px; background:#e5e7eb; padding:4px; border-radius:8px; margin-bottom:1.5rem; }
+.tab-btn {
+    flex:1; padding:12px; border:none; background:transparent; cursor:pointer;
+    font-weight:700; font-size:11px; text-transform:uppercase; color:#64748b;
+    border-radius:6px; transition:all .2s;
+}
+.tab-btn.active { background:white; color:#005596; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
     </style>
 </head>
 <body class="p-3 md:p-6">
-<div class="max-w-7xl mx-auto">
+<div class="max-w-[1440px] mx-auto">
 
-<!-- HEADER -->
+<!-- HEADER ÚNICO -->
 <header class="card !p-0 overflow-hidden mb-6">
     <div class="p-6 flex flex-col md:flex-row justify-between items-start">
-        <div class="flex items-center gap-3 mb-2">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:#005596;">
-                <span class="text-white font-black text-xl">e</span>
-            </div>
-            <div>
-                <h1 class="text-2xl font-black" style="color:#005596;">ENERGISA</h1>
-                <p class="text-xs text-gray-500 font-bold">Inteligência Regulatória</p>
+        <div class="flex items-center gap-4 mb-2">
+            <img src="ENERGISA-DIST_LOGOTIPO_LOGOTIPO VERSÃO HORIZONTAL AZUL ESCURO.png" alt="Logo Energisa" style="height:45px; object-fit:contain;">
+            <div style="border-left:2px solid #e5e7eb; padding-left:1rem;">
+                <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Inteligência Regulatória</p>
+                <h1 class="text-lg font-black" style="color:#005596;">Painel de Impacto Regulatório Consolidado</h1>
+                <p class="text-xs text-gray-400">Penalidades · Parcela B · Custo por UC · 2018–2026</p>
             </div>
         </div>
         <div class="text-right">
-            <p class="text-sm font-bold uppercase tracking-wider text-gray-500">Processos de Infração ANEEL</p>
+            <p class="text-sm font-black text-gray-500 uppercase tracking-wider">ANEEL — Processos de Infração</p>
             <p class="text-xl font-black" style="color:#F37021;">2018–2026</p>
-            <p class="text-xs text-gray-400 mt-1">Atualizado: 30/04/2026</p>
+            <p class="text-xs text-gray-400 mt-1">Atualizado: 07/05/2026</p>
         </div>
     </div>
     <div class="header-stripe"></div>
 </header>
+
+<!-- NAVEGAÇÃO -->
+<nav class="tabs-nav no-print">
+    <button class="tab-btn active" onclick="showTab('tab-penalidades', this)">📊 Processos de Infração</button>
+    <button class="tab-btn" onclick="showTab('tab-uc', this)">👥 Análise UC</button>
+    <button class="tab-btn" onclick="showTab('tab-parcelab', this)">📈 Impacto Regulatório</button>
+</nav>
+
+<!-- ABA 1: PENALIDADES (conteúdo original do index (1).html) -->
+<div id="tab-penalidades" class="tab-content active">
+
+
+<!-- HEADER -->
+
 
 <!-- TÍTULO -->
 <section class="mb-5">
@@ -286,14 +386,166 @@
 </div>
 
 <!-- FOOTER -->
-<div class="card border border-gray-200" style="background:#f9f9f9;text-align:center;">
-    <button onclick="window.print()" class="no-print px-6 py-2 rounded font-bold text-xs mb-3"
-        style="background:#005596;color:white;cursor:pointer;border:none;">🖨️ IMPRIMIR</button>
+<div class="card border border-gray-200" style="background:#f9f9f9;text-align:center; display:flex; flex-direction:column; align-items:center;">
+    <div class="no-print flex gap-3 mb-3">
+        <button onclick="window.print()" class="px-6 py-2 rounded font-bold text-xs shadow-sm hover:opacity-90"
+            style="background:#005596;color:white;cursor:pointer;border:none;transition:0.2s;">🖨️ IMPRIMIR PDF</button>
+        <button onclick="exportToExcel()" class="px-6 py-2 rounded font-bold text-xs shadow-sm hover:opacity-90"
+            style="background:#10b981;color:white;cursor:pointer;border:none;transition:0.2s;">📊 EXPORTAR EXCEL</button>
+    </div>
     <p class="text-xs text-gray-500">Fonte: ANEEL | Processos 2018–2026 (inclui em análise) | Valores em R$ Mi | Confidencial</p>
 </div>
 
+
+</div>
+
+<!-- ABA 2: PARCELA B -->
+<div id="tab-parcelab" class="tab-content">
+
+    
+
+    <div class="kpi-grid">
+        <div class="kpi-item">
+            <div class="kpi-val" id="kpi-total-cos-pct">--</div>
+            <div class="kpi-lbl">Distribuidoras</div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-val" id="kpi-avg-impact-pct" style="color:#d97706;">0.00%</div>
+            <div class="kpi-lbl">Impacto Médio Global</div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-val" id="kpi-total-multas-pct" style="color:#dc2626;">R$ 0,0 Mi</div>
+            <div class="kpi-lbl">Total Multas (Período)</div>
+        </div>
+        <div class="kpi-item" style="border-top-color:#059669;">
+            <div class="kpi-val" id="kpi-total-pb-pct" style="color:#059669;">R$ 0,0 Bi</div>
+            <div class="kpi-lbl">Total Parcela B (Período)</div>
+        </div>
+    </div>
+
+    <div class="card !p-0 overflow-hidden">
+        <div class="bg-slate-800 px-6 py-4 flex justify-between items-center">
+            <h3 class="text-white font-bold text-xs uppercase tracking-wider">📊 Evolução Anual: Multa (R$ Mi) / Parcela B (R$ Mi) = Impacto (%)</h3>
+            <div class="flex gap-2">
+                <button onclick="exportCSVpct()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold py-1 px-3 rounded transition-all">⬇️ EXPORTAR CSV</button>
+                <button onclick="window.print()" class="bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold py-1 px-3 rounded transition-all">🖨️ IMPRIMIR</button>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="exec-table">
+                <thead>
+                    <tr>
+                        <th rowspan="3">Distribuidora</th>
+                        <th rowspan="3">Grupo</th>
+                        <th colspan="9" class="yr">Índice de Impacto Regulatório</th>
+                        <th rowspan="3" style="background:#1e293b;">Média %</th>
+                    </tr>
+                    <tr>
+                        <th class="yr">2018</th>
+                        <th class="yr">2019</th>
+                        <th class="yr">2020</th>
+                        <th class="yr">2021</th>
+                        <th class="yr">2022</th>
+                        <th class="yr">2023</th>
+                        <th class="yr">2024</th>
+                        <th class="yr">2025</th>
+                        <th class="yr-26">2026*</th>
+                    </tr>
+                    <tr style="background:#002d55;">
+                        <th colspan="9" class="yr" style="font-size:8px; font-weight:400; font-style:italic; background:#002d55;">Multa (R$ Mi) ÷ Parcela B (R$ Mi) = Impacto (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body-pct">
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4 bg-slate-50 border-t border-slate-200">
+            <p class="text-[9px] text-slate-500 italic">* 2026: Processos em fase de fiscalização/análise. Valores de Parcela B projetados conforme base regulatória.</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- ABA 3: CUSTO UC -->
+<div id="tab-uc" class="tab-content">
+
+    
+
+    <div class="kpi-grid">
+        <div class="kpi-item">
+            <div class="kpi-val" id="kpi-total-cos-ucs">--</div>
+            <div class="kpi-lbl">Distribuidoras</div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-val" id="kpi-avg-impact-ucs" style="color:#d97706;">R$ 0,00</div>
+            <div class="kpi-lbl">Custo Médio / UC</div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-val" id="kpi-total-multas-ucs" style="color:#dc2626;">R$ 0,0 Mi</div>
+            <div class="kpi-lbl">Total Multas (Período)</div>
+        </div>
+        <div class="kpi-item" style="border-top-color:#059669;">
+            <div class="kpi-val" id="kpi-total-ucs-ucs" style="color:#059669;">--</div>
+            <div class="kpi-lbl">Total UCs (Base 2025)</div>
+        </div>
+    </div>
+
+    <div class="card !p-0 overflow-hidden">
+        <div class="bg-slate-800 px-6 py-4 flex justify-between items-center">
+            <h3 class="text-white font-bold text-xs uppercase tracking-wider">📊 Evolução Anual: Multa (R$ Mi) / Qtd UCs = R$ per UC</h3>
+            <div class="flex gap-2">
+                <button onclick="exportCSVucs()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold py-1 px-3 rounded transition-all">⬇️ EXPORTAR CSV</button>
+                <button onclick="window.print()" class="bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold py-1 px-3 rounded transition-all">🖨️ IMPRIMIR</button>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="exec-table">
+                <thead>
+                    <tr>
+                        <th rowspan="3">Distribuidora</th>
+                        <th rowspan="3">Grupo</th>
+                        <th class="yr">2018</th>
+                        <th class="yr">2019</th>
+                        <th class="yr">2020</th>
+                        <th class="yr">2021</th>
+                        <th class="yr">2022</th>
+                        <th class="yr">2023</th>
+                        <th class="yr">2024</th>
+                        <th class="yr">2025</th>
+                        <th class="yr-26">2026*</th>
+                        <th rowspan="3" style="background:#1e293b;">Média R$/UC</th>
+                    </tr>
+                    <tr style="background:#002d55;">
+                        <th colspan="9" class="yr" style="font-size:8px; font-weight:400; font-style:italic; background:#002d55;">Multa (R$ Mi) ÷ Qtd UCs = R$ / UC</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body-ucs"></tbody>
+            </table>
+        </div>
+        <div class="p-4 bg-slate-50 border-t border-slate-200">
+            <p class="text-[9px] text-slate-500 italic">* 2026: Baseado em UCs de 2025. Processos em fase de fiscalização/análise.</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="card border border-gray-200 text-center py-4" style="background:#f9f9f9;">
+    <p class="text-xs text-gray-500">Fonte: ANEEL | Processos 2018–2026 | Parcela B Regulatória | UCs Base Dezembro | Confidencial — Energisa Inteligência</p>
+</footer>
+
 </div>
 <script>
+
+function showTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+}
+
+/* ── Scripts do Index (Distribuidoras + Grupos) ── */
+
 const ANOS = ['2018','2019','2020','2021','2022','2023','2024','2025','2026'];
 
 const distribuidoras = [{"nome": "ENEL SP (Eletropaulo)", "grupo": "ENEL", "2018": [1, 38.526687], "2019": null, "2020": [1, 13.512333], "2022": [2, 112.118091], "2024": null, "2025": [2, 165.807883], "2026": [1, 0.0]}, {"nome": "Equatorial GO", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": null, "2025": [3, 123.358121], "2026": null}, {"nome": "CELG-D", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 7.915238], "2020": [1, 44.171531], "2022": null, "2024": null, "2025": [2, 72.479756], "2026": null}, {"nome": "ENEL RJ (Ampla)", "grupo": "ENEL", "2018": null, "2019": null, "2020": null, "2022": [1, 17.011037], "2024": null, "2025": [1, 54.054199], "2026": [1, 0.0]}, {"nome": "Light RJ", "grupo": "LIGHT", "2018": null, "2019": null, "2020": [2, 21.981843], "2022": null, "2024": null, "2025": [3, 56.788565], "2026": [1, 0.0]}, {"nome": "ENEL CE", "grupo": "ENEL", "2018": [1, 0.260279], "2019": null, "2020": [1, 26.019275], "2022": [1, 35.916136], "2024": [1, 28.550163], "2025": null, "2026": null}, {"nome": "Equatorial RS (CEEE-D)", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 1.148082], "2020": null, "2022": [1, 3.452604], "2024": [2, 54.345234], "2025": [2, 0.0], "2026": [1, 0.0]}, {"nome": "Equatorial MA", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 0.298888], "2020": null, "2022": [1, 27.453201], "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Paulista", "grupo": "CPFL", "2018": null, "2019": null, "2020": null, "2022": [1, 9.95248], "2024": [1, 48.277709], "2025": null, "2026": null}, {"nome": "RGE Sul", "grupo": "CPFL", "2018": null, "2019": null, "2020": [1, 40.164063], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia PE (CELPE)", "grupo": "NEOENERGIA", "2018": [1, 1.689893], "2019": [1, 2.925092], "2020": [1, 7.90888], "2022": null, "2024": [1, 32.949775], "2025": null, "2026": null}, {"nome": "Neoenergia BA (COELBA)", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 24.089829], "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia Elektro", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 22.472278], "2024": null, "2025": null, "2026": null}, {"nome": "CELESC", "grupo": "CELESC", "2018": null, "2019": [1, 3.379013], "2020": [1, 13.996524], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CEMIG-D", "grupo": "CEMIG", "2018": [1, 15.075127], "2019": null, "2020": null, "2022": null, "2024": null, "2025": [3, 0.0], "2026": [1, 0.0]}, {"nome": "EDP SP", "grupo": "EDP", "2018": null, "2019": null, "2020": null, "2022": [1, 18.111882], "2024": [1, 16.021419], "2025": null, "2026": null}, {"nome": "ENERGISA MT (EMT)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": [2, 8.421441], "2022": [1, 37.280176], "2024": null, "2025": null, "2026": null}, {"nome": "Equatorial AL", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [3, 14.134885], "2025": [1, 0.0], "2026": [1, 0.0]}, {"nome": "Equatorial PI", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 10.556488], "2025": null, "2026": null}, {"nome": "COPEL-DIS", "grupo": "COPEL", "2018": null, "2019": null, "2020": [1, 1.911211], "2022": null, "2024": [1, 6.386919], "2025": [1, 0.0], "2026": null}, {"nome": "CEA", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 8.343522], "2025": null, "2026": null}, {"nome": "EDP ES", "grupo": "EDP", "2018": null, "2019": [1, 0.060363], "2020": [1, 3.708667], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA MS (EMS)", "grupo": "ENERGISA", "2018": null, "2019": [1, 0.813956], "2020": [1, 1.749501], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA MR (EMR)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": [1, 2.456218], "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA TO (ETO)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": [1, 3.416596], "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA RO (CERON)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 4.443841], "2025": null, "2026": null}, {"nome": "CELPA", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 2.156657], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Leste Paulista", "grupo": "CPFL", "2018": null, "2019": [1, 0.015116], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Sul Paulista", "grupo": "CPFL", "2018": null, "2019": [1, 0.046191], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Jaguari", "grupo": "CPFL", "2018": [1, 0.0], "2019": null, "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Piratininga", "grupo": "CPFL", "2018": [1, 0.0], "2019": null, "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia DF (CEB)", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 1.408462], "2024": null, "2025": [2, 0.0], "2026": null}, {"nome": "ENERGISA SS (ESS)", "grupo": "ENERGISA", "2018": null, "2019": [1, 0.546585], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA SE (ESE)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": [1, 1.68761], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Sulgipe", "grupo": "SULGIPE", "2018": null, "2019": null, "2020": [1, 0.011668], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CHESP", "grupo": "CHESP", "2018": null, "2019": [1, 0.004563], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "DEMEI", "grupo": "DEMEI", "2018": null, "2019": [1, 0.000115], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Nova Palma Energia", "grupo": "NOVA PALMA", "2018": null, "2019": null, "2020": [1, 0.0], "2022": null, "2024": null, "2025": null, "2026": null}];
@@ -410,6 +662,306 @@ function renderGrupos() {
 
 renderDist();
 renderGrupos();
+
+function exportToExcel() {
+    // Inicializa uma nova planilha em branco
+    const wb = XLSX.utils.book_new();
+    
+    // Puxa a Tabela 1 (Distribuidoras) do HTML
+    const tableDist = document.querySelectorAll('.exec-table')[0];
+    const ws1 = XLSX.utils.table_to_sheet(tableDist);
+    XLSX.utils.book_append_sheet(wb, ws1, "Distribuidoras");
+
+    // Puxa a Tabela 2 (Grupos) do HTML
+    const tableGrupos = document.querySelectorAll('.exec-table')[1];
+    const ws2 = XLSX.utils.table_to_sheet(tableGrupos);
+    XLSX.utils.book_append_sheet(wb, ws2, "Grupos");
+
+    // Gera o arquivo para download
+    XLSX.writeFile(wb, "Relatorio_Multas_ANEEL_Energisa.xlsx");
+}
+
+
+/* ── Scripts Parcela B ── */
+
+const ANOS_PCT = ['2018','2019','2020','2021','2022','2023','2024','2025','2026'];
+
+const penaltiesRawPct = [{"nome": "ENEL SP (Eletropaulo)", "grupo": "ENEL", "2018": [1, 38.526687], "2019": null, "2020": [1, 13.512333], "2022": [2, 112.118091], "2024": null, "2025": [2, 165.807883], "2026": [1, 0.0]}, {"nome": "Equatorial GO", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": null, "2025": [3, 123.358121], "2026": null}, {"nome": "CELG-D", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 7.915238], "2020": [1, 44.171531], "2022": null, "2024": null, "2025": [2, 72.479756], "2026": null}, {"nome": "ENEL RJ (Ampla)", "grupo": "ENEL", "2018": null, "2019": null, "2020": null, "2022": [1, 17.011037], "2024": null, "2025": [1, 54.054199], "2026": [1, 0.0]}, {"nome": "Light RJ", "grupo": "LIGHT", "2018": null, "2019": null, "2020": [2, 21.981843], "2022": null, "2024": null, "2025": [3, 56.788565], "2026": [1, 0.0]}, {"nome": "ENEL CE", "grupo": "ENEL", "2018": [1, 0.260279], "2019": null, "2020": [1, 26.019275], "2022": [1, 35.916136], "2024": [1, 28.550163], "2025": null, "2026": null}, {"nome": "Equatorial RS (CEEE-D)", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 1.148082], "2020": null, "2022": [1, 3.452604], "2024": [2, 54.345234], "2025": [2, 0.0], "2026": [1, 0.0]}, {"nome": "Equatorial MA", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 0.298888], "2020": null, "2022": [1, 27.453201], "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Paulista", "grupo": "CPFL", "2018": null, "2019": null, "2020": null, "2022": [1, 9.95248], "2024": [1, 48.277709], "2025": null, "2026": null}, {"nome": "RGE Sul", "grupo": "CPFL", "2018": null, "2019": null, "2020": [1, 40.164063], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia PE (CELPE)", "grupo": "NEOENERGIA", "2018": [1, 1.689893], "2019": [1, 2.925092], "2020": [1, 7.90888], "2022": null, "2024": [1, 32.949775], "2025": null, "2026": null}, {"nome": "Neoenergia BA (COELBA)", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 24.089829], "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia Elektro", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 22.472278], "2024": null, "2025": null, "2026": null}, {"nome": "CELESC", "grupo": "CELESC", "2018": null, "2019": [1, 3.379013], "2020": [1, 13.996524], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CEMIG-D", "grupo": "CEMIG", "2018": [1, 15.075127], "2019": null, "2020": null, "2022": null, "2024": null, "2025": [3, 0.0], "2026": [1, 0.0]}, {"nome": "EDP SP", "grupo": "EDP", "2018": null, "2019": null, "2020": null, "2022": [1, 18.111882], "2024": [1, 16.021419], "2025": null, "2026": null}, {"nome": "ENERGISA MT (EMT)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": [2, 8.421441], "2022": [1, 37.280176], "2024": null, "2025": null, "2026": null}, {"nome": "Equatorial AL", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [3, 14.134885], "2025": [1, 0.0], "2026": [1, 0.0]}, {"nome": "Equatorial PI", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 10.556488], "2025": null, "2026": null}, {"nome": "COPEL-DIS", "grupo": "COPEL", "2018": null, "2019": null, "2020": [1, 1.911211], "2022": null, "2024": [1, 6.386919], "2025": [1, 0.0], "2026": null}, {"nome": "CEA", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 8.343522], "2025": null, "2026": null}, {"nome": "EDP ES", "grupo": "EDP", "2018": null, "2019": [1, 0.060363], "2020": [1, 3.708667], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA MS (EMS)", "grupo": "ENERGISA", "2018": null, "2019": [1, 0.813956], "2020": [1, 1.749501], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA MR (EMR)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": [1, 2.456218], "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA TO (ETO)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": [1, 3.416596], "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA RO (CERON)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 4.443841], "2025": null, "2026": null}, {"nome": "CELPA", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 2.156657], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Leste Paulista", "grupo": "CPFL", "2018": null, "2019": [1, 0.015116], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Sul Paulista", "grupo": "CPFL", "2018": null, "2019": [1, 0.046191], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Jaguari", "grupo": "CPFL", "2018": [1, 0.0], "2019": null, "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Piratininga", "grupo": "CPFL", "2018": [1, 0.0], "2019": null, "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia DF (CEB)", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 1.408462], "2024": null, "2025": [2, 0.0], "2026": null}, {"nome": "ENERGISA SS (ESS)", "grupo": "ENERGISA", "2018": null, "2019": [1, 0.546585], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA SE (ESE)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": [1, 1.68761], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Sulgipe", "grupo": "SULGIPE", "2018": null, "2019": null, "2020": [1, 0.011668], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CHESP", "grupo": "CHESP", "2018": null, "2019": [1, 0.004563], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "DEMEI", "grupo": "DEMEI", "2018": null, "2019": [1, 0.000115], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Nova Palma Energia", "grupo": "NOVA PALMA", "2018": null, "2019": null, "2020": [1, 0.0], "2022": null, "2024": null, "2025": null, "2026": null}];
+
+const pbDataPct = [{"Empresa": "AmE", "Ano": 2018, "Parcela B (R$)": 679029844.64}, {"Empresa": "AmE", "Ano": 2019, "Parcela B (R$)": 666309311.14}, {"Empresa": "AmE", "Ano": 2020, "Parcela B (R$)": 1061374398.74}, {"Empresa": "AmE", "Ano": 2022, "Parcela B (R$)": 1270468991.0}, {"Empresa": "AmE", "Ano": 2023, "Parcela B (R$)": 1270468991.0}, {"Empresa": "AmE", "Ano": 2024, "Parcela B (R$)": 1006260923.59}, {"Empresa": "AmE", "Ano": 2025, "Parcela B (R$)": 1043617158.61}, {"Empresa": "AmE", "Ano": 2026, "Parcela B (R$)": 1074704317.41}, {"Empresa": "AmE", "Ano": 2027, "Parcela B (R$)": 1093397787.07}, {"Empresa": "AmE", "Ano": 2028, "Parcela B (R$)": 1115577563.0}, {"Empresa": "AmE", "Ano": 2029, "Parcela B (R$)": 1476946287.19}, {"Empresa": "AmE", "Ano": 2030, "Parcela B (R$)": 1577376821.84}, {"Empresa": "CEA", "Ano": 2018, "Parcela B (R$)": 215827793.84}, {"Empresa": "CEA", "Ano": 2019, "Parcela B (R$)": 211750526.21}, {"Empresa": "CEA", "Ano": 2020, "Parcela B (R$)": 208334410.88}, {"Empresa": "CEA", "Ano": 2021, "Parcela B (R$)": 267788800.0}, {"Empresa": "CEA", "Ano": 2022, "Parcela B (R$)": 276302163.0}, {"Empresa": "CEA", "Ano": 2023, "Parcela B (R$)": 359877469.42}, {"Empresa": "CEA", "Ano": 2024, "Parcela B (R$)": 441890364.59}, {"Empresa": "CEA", "Ano": 2025, "Parcela B (R$)": 478752830.16}, {"Empresa": "CEA", "Ano": 2026, "Parcela B (R$)": 508665098.98}, {"Empresa": "CEA", "Ano": 2027, "Parcela B (R$)": 547759517.41}, {"Empresa": "CEA", "Ano": 2028, "Parcela B (R$)": 581949239.51}, {"Empresa": "CEA", "Ano": 2029, "Parcela B (R$)": 615686852.07}, {"Empresa": "CEEE", "Ano": 2018, "Parcela B (R$)": 738918429.83}, {"Empresa": "CEEE", "Ano": 2019, "Parcela B (R$)": 779974035.57}, {"Empresa": "CEEE", "Ano": 2020, "Parcela B (R$)": 805688579.4}, {"Empresa": "CEEE", "Ano": 2021, "Parcela B (R$)": 950550310.49}, {"Empresa": "CEEE", "Ano": 2022, "Parcela B (R$)": 1048528273.0}, {"Empresa": "CEEE", "Ano": 2023, "Parcela B (R$)": 1199403970.0}, {"Empresa": "CEEE", "Ano": 2024, "Parcela B (R$)": 1309803924.0}, {"Empresa": "CEEE", "Ano": 2025, "Parcela B (R$)": 1378805196.86}, {"Empresa": "CEEE", "Ano": 2026, "Parcela B (R$)": 1597725425.37}, {"Empresa": "CEEE", "Ano": 2027, "Parcela B (R$)": 1666631833.43}, {"Empresa": "CEEE", "Ano": 2028, "Parcela B (R$)": 1743830325.4}, {"Empresa": "CEEE", "Ano": 2029, "Parcela B (R$)": 1835394716.78}, {"Empresa": "CELESC", "Ano": 2018, "Parcela B (R$)": 1506197069.5}, {"Empresa": "CELESC", "Ano": 2019, "Parcela B (R$)": 1637482878.68}, {"Empresa": "CELESC", "Ano": 2020, "Parcela B (R$)": 1718258318.09}, {"Empresa": "CELESC", "Ano": 2022, "Parcela B (R$)": 2153673071.0}, {"Empresa": "CELESC", "Ano": 2023, "Parcela B (R$)": 2320333880.0}, {"Empresa": "CELESC", "Ano": 2024, "Parcela B (R$)": 2519881517.0}, {"Empresa": "CELESC", "Ano": 2025, "Parcela B (R$)": 2576298880.84}, {"Empresa": "CELESC", "Ano": 2026, "Parcela B (R$)": 2930081763.81}, {"Empresa": "CELESC", "Ano": 2027, "Parcela B (R$)": 3173837463.72}, {"Empresa": "CELESC", "Ano": 2028, "Parcela B (R$)": 3438496593.83}, {"Empresa": "CELESC", "Ano": 2029, "Parcela B (R$)": 3728183183.02}, {"Empresa": "CELESC", "Ano": 2030, "Parcela B (R$)": 4033314603.33}, {"Empresa": "CELPE", "Ano": 2018, "Parcela B (R$)": 1478804735.13}, {"Empresa": "CELPE", "Ano": 2019, "Parcela B (R$)": 1650584748.53}, {"Empresa": "CELPE", "Ano": 2020, "Parcela B (R$)": 1816950705.4}, {"Empresa": "CELPE", "Ano": 2022, "Parcela B (R$)": 2301698010.0}, {"Empresa": "CELPE", "Ano": 2023, "Parcela B (R$)": 2322522042.0}, {"Empresa": "CELPE", "Ano": 2024, "Parcela B (R$)": 2365018662.82}, {"Empresa": "CELPE", "Ano": 2025, "Parcela B (R$)": 2793679950.58}, {"Empresa": "CELPE", "Ano": 2026, "Parcela B (R$)": 2872270239.0}, {"Empresa": "CELPE", "Ano": 2027, "Parcela B (R$)": 2991443345.18}, {"Empresa": "CELPE", "Ano": 2028, "Parcela B (R$)": 3133417473.12}, {"Empresa": "CELPE", "Ano": 2029, "Parcela B (R$)": 3379249735.64}, {"Empresa": "CELPE", "Ano": 2030, "Parcela B (R$)": 3580532985.15}, {"Empresa": "CEMIG", "Ano": 2018, "Parcela B (R$)": 4501477596.48}, {"Empresa": "CEMIG", "Ano": 2019, "Parcela B (R$)": 4934291598.56}, {"Empresa": "CEMIG", "Ano": 2020, "Parcela B (R$)": 5135806608.73}, {"Empresa": "CEMIG", "Ano": 2022, "Parcela B (R$)": 6392789659.0}, {"Empresa": "CEMIG", "Ano": 2023, "Parcela B (R$)": 6719003437.39}, {"Empresa": "CEMIG", "Ano": 2024, "Parcela B (R$)": 7349637281.0}, {"Empresa": "CEMIG", "Ano": 2025, "Parcela B (R$)": 7608288388.62}, {"Empresa": "CEMIG", "Ano": 2026, "Parcela B (R$)": 7840562400.8}, {"Empresa": "CEMIG", "Ano": 2027, "Parcela B (R$)": 8221922664.09}, {"Empresa": "CEMIG", "Ano": 2028, "Parcela B (R$)": 10112560242.0}, {"Empresa": "CEMIG", "Ano": 2029, "Parcela B (R$)": 10710788213.84}, {"Empresa": "CEMIG", "Ano": 2030, "Parcela B (R$)": 11368728539.15}, {"Empresa": "CHESP", "Ano": 2018, "Parcela B (R$)": 23829148.4}, {"Empresa": "CHESP", "Ano": 2019, "Parcela B (R$)": 24514310.32}, {"Empresa": "CHESP", "Ano": 2020, "Parcela B (R$)": 26070301.43}, {"Empresa": "CHESP", "Ano": 2021, "Parcela B (R$)": 26669127.58}, {"Empresa": "CHESP", "Ano": 2022, "Parcela B (R$)": 28301549.0}, {"Empresa": "CHESP", "Ano": 2023, "Parcela B (R$)": 33565851.0}, {"Empresa": "CHESP", "Ano": 2024, "Parcela B (R$)": 39929570.0}, {"Empresa": "CHESP", "Ano": 2025, "Parcela B (R$)": 43610718.86}, {"Empresa": "CHESP", "Ano": 2026, "Parcela B (R$)": 46940976.64}, {"Empresa": "CHESP", "Ano": 2027, "Parcela B (R$)": 48468956.21}, {"Empresa": "CHESP", "Ano": 2028, "Parcela B (R$)": 50060105.05}, {"Empresa": "CHESP", "Ano": 2029, "Parcela B (R$)": 52043818.38}, {"Empresa": "COCEL", "Ano": 2018, "Parcela B (R$)": 23053626.02}, {"Empresa": "COCEL", "Ano": 2019, "Parcela B (R$)": 24158032.13}, {"Empresa": "COCEL", "Ano": 2020, "Parcela B (R$)": 24124464.33}, {"Empresa": "COCEL", "Ano": 2022, "Parcela B (R$)": 27932230.0}, {"Empresa": "COCEL", "Ano": 2023, "Parcela B (R$)": 29452072.0}, {"Empresa": "COCEL", "Ano": 2024, "Parcela B (R$)": 31929409.0}, {"Empresa": "COCEL", "Ano": 2025, "Parcela B (R$)": 33757931.59}, {"Empresa": "COCEL", "Ano": 2026, "Parcela B (R$)": 30902737.11}, {"Empresa": "COCEL", "Ano": 2027, "Parcela B (R$)": 32411439.44}, {"Empresa": "COCEL", "Ano": 2028, "Parcela B (R$)": 33984688.42}, {"Empresa": "COCEL", "Ano": 2029, "Parcela B (R$)": 35553463.79}, {"Empresa": "COCEL", "Ano": 2030, "Parcela B (R$)": 37174849.38}, {"Empresa": "COELBA", "Ano": 2018, "Parcela B (R$)": 2282475335.22}, {"Empresa": "COELBA", "Ano": 2019, "Parcela B (R$)": 3264106835.82}, {"Empresa": "COELBA", "Ano": 2020, "Parcela B (R$)": 3585444458.49}, {"Empresa": "COELBA", "Ano": 2022, "Parcela B (R$)": 5246127362.0}, {"Empresa": "COELBA", "Ano": 2023, "Parcela B (R$)": 5490252017.3}, {"Empresa": "COELBA", "Ano": 2024, "Parcela B (R$)": 5513005407.0}, {"Empresa": "COELBA", "Ano": 2025, "Parcela B (R$)": 6321904692.85}, {"Empresa": "COELBA", "Ano": 2026, "Parcela B (R$)": 6506493807.69}, {"Empresa": "COELBA", "Ano": 2027, "Parcela B (R$)": 6771485720.4}, {"Empresa": "COELBA", "Ano": 2028, "Parcela B (R$)": 7150750506.51}, {"Empresa": "COELBA", "Ano": 2029, "Parcela B (R$)": 7495264941.48}, {"Empresa": "COELBA", "Ano": 2030, "Parcela B (R$)": 7884459000.09}, {"Empresa": "COOPERALIANCA", "Ano": 2018, "Parcela B (R$)": 20718288.91}, {"Empresa": "COOPERALIANCA", "Ano": 2019, "Parcela B (R$)": 22726025.39}, {"Empresa": "COOPERALIANCA", "Ano": 2020, "Parcela B (R$)": 23645215.9}, {"Empresa": "COOPERALIANCA", "Ano": 2022, "Parcela B (R$)": 27669403.94}, {"Empresa": "COOPERALIANCA", "Ano": 2023, "Parcela B (R$)": 30318453.0}, {"Empresa": "COOPERALIANCA", "Ano": 2024, "Parcela B (R$)": 34160302.0}, {"Empresa": "COOPERALIANCA", "Ano": 2025, "Parcela B (R$)": 35734436.27}, {"Empresa": "COOPERALIANCA", "Ano": 2026, "Parcela B (R$)": 37588316.33}, {"Empresa": "COOPERALIANCA", "Ano": 2027, "Parcela B (R$)": 38076547.23}, {"Empresa": "COOPERALIANCA", "Ano": 2028, "Parcela B (R$)": 39930689.95}, {"Empresa": "COOPERALIANCA", "Ano": 2029, "Parcela B (R$)": 41939259.47}, {"Empresa": "COOPERALIANCA", "Ano": 2030, "Parcela B (R$)": 44010020.66}, {"Empresa": "COPEL", "Ano": 2018, "Parcela B (R$)": 2411312362.08}, {"Empresa": "COPEL", "Ano": 2019, "Parcela B (R$)": 2568435348.51}, {"Empresa": "COPEL", "Ano": 2020, "Parcela B (R$)": 2698835889.75}, {"Empresa": "COPEL", "Ano": 2022, "Parcela B (R$)": 3307161057.0}, {"Empresa": "COPEL", "Ano": 2023, "Parcela B (R$)": 3377360740.0}, {"Empresa": "COPEL", "Ano": 2024, "Parcela B (R$)": 3817177680.28}, {"Empresa": "COPEL", "Ano": 2025, "Parcela B (R$)": 4129606529.38}, {"Empresa": "COPEL", "Ano": 2026, "Parcela B (R$)": 4473712787.0}, {"Empresa": "COPEL", "Ano": 2027, "Parcela B (R$)": 4722708514.38}, {"Empresa": "COPEL", "Ano": 2028, "Parcela B (R$)": 4984901884.47}, {"Empresa": "COPEL", "Ano": 2029, "Parcela B (R$)": 5254884011.44}, {"Empresa": "COPEL", "Ano": 2030, "Parcela B (R$)": 5552054943.53}, {"Empresa": "COSERN", "Ano": 2018, "Parcela B (R$)": 654296908.8}, {"Empresa": "COSERN", "Ano": 2019, "Parcela B (R$)": 717384381.53}, {"Empresa": "COSERN", "Ano": 2020, "Parcela B (R$)": 773758345.77}, {"Empresa": "COSERN", "Ano": 2022, "Parcela B (R$)": 1200635277.0}, {"Empresa": "COSERN", "Ano": 2023, "Parcela B (R$)": 1181277978.13}, {"Empresa": "COSERN", "Ano": 2024, "Parcela B (R$)": 1183908228.64}, {"Empresa": "COSERN", "Ano": 2025, "Parcela B (R$)": 1383472867.12}, {"Empresa": "COSERN", "Ano": 2026, "Parcela B (R$)": 1390762938.32}, {"Empresa": "COSERN", "Ano": 2027, "Parcela B (R$)": 1435103274.15}, {"Empresa": "COSERN", "Ano": 2028, "Parcela B (R$)": 1511794712.14}, {"Empresa": "COSERN", "Ano": 2029, "Parcela B (R$)": 1576776544.09}, {"Empresa": "COSERN", "Ano": 2030, "Parcela B (R$)": 1647732508.74}, {"Empresa": "CPFL-Paulista", "Ano": 2018, "Parcela B (R$)": 2171817279.07}, {"Empresa": "CPFL-Paulista", "Ano": 2019, "Parcela B (R$)": 2532409414.88}, {"Empresa": "CPFL-Paulista", "Ano": 2020, "Parcela B (R$)": 2752461248.0}, {"Empresa": "CPFL-Paulista", "Ano": 2022, "Parcela B (R$)": 4178016903.0}, {"Empresa": "CPFL-Paulista", "Ano": 2023, "Parcela B (R$)": 4112509761.05}, {"Empresa": "CPFL-Paulista", "Ano": 2024, "Parcela B (R$)": 4255723650.0}, {"Empresa": "CPFL-Paulista", "Ano": 2025, "Parcela B (R$)": 4633583227.32}, {"Empresa": "CPFL-Paulista", "Ano": 2026, "Parcela B (R$)": 4726866080.85}, {"Empresa": "CPFL-Paulista", "Ano": 2027, "Parcela B (R$)": 4831383749.31}, {"Empresa": "CPFL-Paulista", "Ano": 2028, "Parcela B (R$)": 4781902496.97}, {"Empresa": "CPFL-Paulista", "Ano": 2029, "Parcela B (R$)": 4988544839.07}, {"Empresa": "CPFL-Paulista", "Ano": 2030, "Parcela B (R$)": 5208384307.11}, {"Empresa": "CPFL-Piratininga", "Ano": 2018, "Parcela B (R$)": 850539893.1}, {"Empresa": "CPFL-Piratininga", "Ano": 2019, "Parcela B (R$)": 920737655.59}, {"Empresa": "CPFL-Piratininga", "Ano": 2020, "Parcela B (R$)": 1072723940.02}, {"Empresa": "CPFL-Piratininga", "Ano": 2021, "Parcela B (R$)": 1437703286.0}, {"Empresa": "CPFL-Piratininga", "Ano": 2022, "Parcela B (R$)": 1543305200.0}, {"Empresa": "CPFL-Piratininga", "Ano": 2023, "Parcela B (R$)": 1472926756.22}, {"Empresa": "CPFL-Piratininga", "Ano": 2024, "Parcela B (R$)": 1678260685.0}, {"Empresa": "CPFL-Piratininga", "Ano": 2025, "Parcela B (R$)": 1754426210.6}, {"Empresa": "CPFL-Piratininga", "Ano": 2026, "Parcela B (R$)": 1780163957.18}, {"Empresa": "CPFL-Piratininga", "Ano": 2027, "Parcela B (R$)": 1677509261.89}, {"Empresa": "CPFL-Piratininga", "Ano": 2028, "Parcela B (R$)": 1730944329.26}, {"Empresa": "CPFL-Piratininga", "Ano": 2029, "Parcela B (R$)": 1786886117.77}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2018, "Parcela B (R$)": 281388624.27}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2019, "Parcela B (R$)": 298607353.2}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2020, "Parcela B (R$)": 301486721.29}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2022, "Parcela B (R$)": 407840353.0}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2023, "Parcela B (R$)": 428672310.0}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2024, "Parcela B (R$)": 474156653.0}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2025, "Parcela B (R$)": 508920699.46}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2026, "Parcela B (R$)": 557652816.62}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2027, "Parcela B (R$)": 580335477.01}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2028, "Parcela B (R$)": 604445199.29}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2029, "Parcela B (R$)": 629548473.72}, {"Empresa": "CPFL-Santa Cruz Nova", "Ano": 2030, "Parcela B (R$)": 656006453.33}, {"Empresa": "DCELT", "Ano": 2018, "Parcela B (R$)": 20590801.72}, {"Empresa": "DCELT", "Ano": 2019, "Parcela B (R$)": 21532538.97}, {"Empresa": "DCELT", "Ano": 2020, "Parcela B (R$)": 21967350.36}, {"Empresa": "DCELT", "Ano": 2022, "Parcela B (R$)": 25570246.0}, {"Empresa": "DCELT", "Ano": 2023, "Parcela B (R$)": 28059308.0}, {"Empresa": "DCELT", "Ano": 2024, "Parcela B (R$)": 32206251.0}, {"Empresa": "DCELT", "Ano": 2025, "Parcela B (R$)": 34008994.4}, {"Empresa": "DCELT", "Ano": 2026, "Parcela B (R$)": 41456727.59}, {"Empresa": "DCELT", "Ano": 2027, "Parcela B (R$)": 42808303.32}, {"Empresa": "DCELT", "Ano": 2028, "Parcela B (R$)": 44076858.69}, {"Empresa": "DCELT", "Ano": 2029, "Parcela B (R$)": 45414747.52}, {"Empresa": "DCELT", "Ano": 2030, "Parcela B (R$)": 46950039.02}, {"Empresa": "DEMEI", "Ano": 2018, "Parcela B (R$)": 17225341.11}, {"Empresa": "DEMEI", "Ano": 2019, "Parcela B (R$)": 16795988.1}, {"Empresa": "DEMEI", "Ano": 2020, "Parcela B (R$)": 17222541.78}, {"Empresa": "DEMEI", "Ano": 2022, "Parcela B (R$)": 16169174.01}, {"Empresa": "DEMEI", "Ano": 2023, "Parcela B (R$)": 17495403.0}, {"Empresa": "DEMEI", "Ano": 2024, "Parcela B (R$)": 20404161.0}, {"Empresa": "DEMEI", "Ano": 2025, "Parcela B (R$)": 20309444.01}, {"Empresa": "DEMEI", "Ano": 2026, "Parcela B (R$)": 21137806.67}, {"Empresa": "DEMEI", "Ano": 2027, "Parcela B (R$)": 21631062.76}, {"Empresa": "DEMEI", "Ano": 2028, "Parcela B (R$)": 22916924.98}, {"Empresa": "DEMEI", "Ano": 2029, "Parcela B (R$)": 24260240.18}, {"Empresa": "DEMEI", "Ano": 2030, "Parcela B (R$)": 25756386.75}, {"Empresa": "DMEPC", "Ano": 2018, "Parcela B (R$)": 50451597.21}, {"Empresa": "DMEPC", "Ano": 2019, "Parcela B (R$)": 48749997.03}, {"Empresa": "DMEPC", "Ano": 2020, "Parcela B (R$)": 52108804.43}, {"Empresa": "DMEPC", "Ano": 2021, "Parcela B (R$)": 57819251.0}, {"Empresa": "DMEPC", "Ano": 2022, "Parcela B (R$)": 64256373.0}, {"Empresa": "DMEPC", "Ano": 2023, "Parcela B (R$)": 67859217.0}, {"Empresa": "DMEPC", "Ano": 2024, "Parcela B (R$)": 74254009.72}, {"Empresa": "DMEPC", "Ano": 2025, "Parcela B (R$)": 81198442.48}, {"Empresa": "DMEPC", "Ano": 2026, "Parcela B (R$)": 84240390.12}, {"Empresa": "DMEPC", "Ano": 2027, "Parcela B (R$)": 87419389.12}, {"Empresa": "DMEPC", "Ano": 2028, "Parcela B (R$)": 90513752.13}, {"Empresa": "DMEPC", "Ano": 2029, "Parcela B (R$)": 93669925.42}, {"Empresa": "EAC", "Ano": 2018, "Parcela B (R$)": 204367735.72}, {"Empresa": "EAC", "Ano": 2019, "Parcela B (R$)": 217971442.82}, {"Empresa": "EAC", "Ano": 2020, "Parcela B (R$)": 287816729.42}, {"Empresa": "EAC", "Ano": 2021, "Parcela B (R$)": 311981968.0}, {"Empresa": "EAC", "Ano": 2022, "Parcela B (R$)": 338718927.0}, {"Empresa": "EAC", "Ano": 2023, "Parcela B (R$)": 398053230.13}, {"Empresa": "EAC", "Ano": 2024, "Parcela B (R$)": 444932408.52}, {"Empresa": "EAC", "Ano": 2025, "Parcela B (R$)": 428449966.82}, {"Empresa": "EAC", "Ano": 2026, "Parcela B (R$)": 444716711.2}, {"Empresa": "EAC", "Ano": 2027, "Parcela B (R$)": 463014346.45}, {"Empresa": "EAC", "Ano": 2028, "Parcela B (R$)": 588568421.52}, {"Empresa": "EAC", "Ano": 2029, "Parcela B (R$)": 620653669.23}, {"Empresa": "EBO", "Ano": 2018, "Parcela B (R$)": 74784786.21}, {"Empresa": "EBO", "Ano": 2019, "Parcela B (R$)": 83266822.26}, {"Empresa": "EBO", "Ano": 2020, "Parcela B (R$)": 90058625.94}, {"Empresa": "EDP ES", "Ano": 2018, "Parcela B (R$)": 861849436.69}, {"Empresa": "EDP ES", "Ano": 2019, "Parcela B (R$)": 978928506.05}, {"Empresa": "EDP ES", "Ano": 2020, "Parcela B (R$)": 1003844084.81}, {"Empresa": "EDP ES", "Ano": 2022, "Parcela B (R$)": 1409055289.34}, {"Empresa": "EDP ES", "Ano": 2023, "Parcela B (R$)": 1407159399.0}, {"Empresa": "EDP ES", "Ano": 2024, "Parcela B (R$)": 1627584996.0}, {"Empresa": "EDP ES", "Ano": 2025, "Parcela B (R$)": 1710774533.72}, {"Empresa": "EDP ES", "Ano": 2026, "Parcela B (R$)": 1747363352.04}, {"Empresa": "EDP ES", "Ano": 2027, "Parcela B (R$)": 1795941806.55}, {"Empresa": "EDP ES", "Ano": 2028, "Parcela B (R$)": 1850640380.49}, {"Empresa": "EDP ES", "Ano": 2029, "Parcela B (R$)": 1913216746.63}, {"Empresa": "EDP ES", "Ano": 2030, "Parcela B (R$)": 2136402031.45}, {"Empresa": "EDP SP", "Ano": 2018, "Parcela B (R$)": 961068786.27}, {"Empresa": "EDP SP", "Ano": 2019, "Parcela B (R$)": 987114534.33}, {"Empresa": "EDP SP", "Ano": 2020, "Parcela B (R$)": 1197946809.5}, {"Empresa": "EDP SP", "Ano": 2021, "Parcela B (R$)": 1588367689.0}, {"Empresa": "EDP SP", "Ano": 2022, "Parcela B (R$)": 1730957238.0}, {"Empresa": "EDP SP", "Ano": 2023, "Parcela B (R$)": 1698911037.61}, {"Empresa": "EDP SP", "Ano": 2024, "Parcela B (R$)": 1925505012.0}, {"Empresa": "EDP SP", "Ano": 2025, "Parcela B (R$)": 1915129954.2}, {"Empresa": "EDP SP", "Ano": 2026, "Parcela B (R$)": 1923644833.03}, {"Empresa": "EDP SP", "Ano": 2027, "Parcela B (R$)": 2020846388.75}, {"Empresa": "EDP SP", "Ano": 2028, "Parcela B (R$)": 2107169114.39}, {"Empresa": "EDP SP", "Ano": 2029, "Parcela B (R$)": 2194937625.93}, {"Empresa": "EFLJC", "Ano": 2018, "Parcela B (R$)": 2570982.19}, {"Empresa": "EFLJC", "Ano": 2019, "Parcela B (R$)": 2714045.86}, {"Empresa": "EFLJC", "Ano": 2020, "Parcela B (R$)": 2935950.41}, {"Empresa": "EFLJC", "Ano": 2022, "Parcela B (R$)": 3514907.0}, {"Empresa": "EFLJC", "Ano": 2023, "Parcela B (R$)": 3946186.0}, {"Empresa": "EFLJC", "Ano": 2024, "Parcela B (R$)": 4733221.04}, {"Empresa": "EFLJC", "Ano": 2025, "Parcela B (R$)": 4945382.52}, {"Empresa": "EFLJC", "Ano": 2026, "Parcela B (R$)": 4325174.88}, {"Empresa": "EFLJC", "Ano": 2027, "Parcela B (R$)": 4314116.13}, {"Empresa": "EFLJC", "Ano": 2028, "Parcela B (R$)": 4305702.34}, {"Empresa": "EFLJC", "Ano": 2029, "Parcela B (R$)": 4308385.59}, {"Empresa": "EFLJC", "Ano": 2030, "Parcela B (R$)": 4318238.91}, {"Empresa": "EFLUL", "Ano": 2018, "Parcela B (R$)": 6628908.33}, {"Empresa": "EFLUL", "Ano": 2019, "Parcela B (R$)": 6960229.55}, {"Empresa": "EFLUL", "Ano": 2020, "Parcela B (R$)": 7175126.28}, {"Empresa": "EFLUL", "Ano": 2022, "Parcela B (R$)": 8469706.0}, {"Empresa": "EFLUL", "Ano": 2023, "Parcela B (R$)": 8820771.0}, {"Empresa": "EFLUL", "Ano": 2024, "Parcela B (R$)": 9919494.0}, {"Empresa": "EFLUL", "Ano": 2025, "Parcela B (R$)": 10398094.8}, {"Empresa": "EFLUL", "Ano": 2026, "Parcela B (R$)": 10743740.92}, {"Empresa": "EFLUL", "Ano": 2027, "Parcela B (R$)": 10840310.51}, {"Empresa": "EFLUL", "Ano": 2028, "Parcela B (R$)": 10933493.89}, {"Empresa": "EFLUL", "Ano": 2029, "Parcela B (R$)": 10991099.27}, {"Empresa": "EFLUL", "Ano": 2030, "Parcela B (R$)": 11100396.64}, {"Empresa": "ELEKTRO", "Ano": 2018, "Parcela B (R$)": 1504267520.21}, {"Empresa": "ELEKTRO", "Ano": 2019, "Parcela B (R$)": 1584267016.92}, {"Empresa": "ELEKTRO", "Ano": 2020, "Parcela B (R$)": 1712264404.66}, {"Empresa": "ELEKTRO", "Ano": 2022, "Parcela B (R$)": 2654776548.0}, {"Empresa": "ELEKTRO", "Ano": 2023, "Parcela B (R$)": 2599170055.29}, {"Empresa": "ELEKTRO", "Ano": 2024, "Parcela B (R$)": 2976816605.0}, {"Empresa": "ELEKTRO", "Ano": 2025, "Parcela B (R$)": 3074613695.78}, {"Empresa": "ELEKTRO", "Ano": 2026, "Parcela B (R$)": 3130636860.96}, {"Empresa": "ELEKTRO", "Ano": 2027, "Parcela B (R$)": 3108514035.97}, {"Empresa": "ELEKTRO", "Ano": 2028, "Parcela B (R$)": 3240519979.5}, {"Empresa": "ELEKTRO", "Ano": 2029, "Parcela B (R$)": 3373775111.09}, {"Empresa": "ELEKTRO", "Ano": 2030, "Parcela B (R$)": 3526246484.89}, {"Empresa": "ELETROCAR", "Ano": 2018, "Parcela B (R$)": 27551009.9}, {"Empresa": "ELETROCAR", "Ano": 2019, "Parcela B (R$)": 26858195.9}, {"Empresa": "ELETROCAR", "Ano": 2020, "Parcela B (R$)": 28211485.84}, {"Empresa": "ELETROCAR", "Ano": 2022, "Parcela B (R$)": 30321572.82}, {"Empresa": "ELETROCAR", "Ano": 2023, "Parcela B (R$)": 32052919.0}, {"Empresa": "ELETROCAR", "Ano": 2024, "Parcela B (R$)": 35181502.0}, {"Empresa": "ELETROCAR", "Ano": 2025, "Parcela B (R$)": 37816061.9}, {"Empresa": "ELETROCAR", "Ano": 2026, "Parcela B (R$)": 39471621.0}, {"Empresa": "ELETROCAR", "Ano": 2027, "Parcela B (R$)": 50339542.34}, {"Empresa": "ELETROCAR", "Ano": 2028, "Parcela B (R$)": 52175388.45}, {"Empresa": "ELETROCAR", "Ano": 2029, "Parcela B (R$)": 54153286.71}, {"Empresa": "ELETROCAR", "Ano": 2030, "Parcela B (R$)": 56377110.49}, {"Empresa": "ELFSM", "Ano": 2018, "Parcela B (R$)": 69223761.76}, {"Empresa": "ELFSM", "Ano": 2019, "Parcela B (R$)": 80222904.28}, {"Empresa": "ELFSM", "Ano": 2020, "Parcela B (R$)": 77830823.07}, {"Empresa": "ELFSM", "Ano": 2022, "Parcela B (R$)": 94940060.0}, {"Empresa": "ELFSM", "Ano": 2023, "Parcela B (R$)": 108028709.0}, {"Empresa": "ELFSM", "Ano": 2024, "Parcela B (R$)": 131495950.0}, {"Empresa": "ELFSM", "Ano": 2025, "Parcela B (R$)": 153590215.54}, {"Empresa": "ELFSM", "Ano": 2026, "Parcela B (R$)": 149776092.86}, {"Empresa": "ELFSM", "Ano": 2027, "Parcela B (R$)": 155104534.12}, {"Empresa": "ELFSM", "Ano": 2028, "Parcela B (R$)": 160199415.08}, {"Empresa": "ELFSM", "Ano": 2029, "Parcela B (R$)": 166003788.65}, {"Empresa": "ELFSM", "Ano": 2030, "Parcela B (R$)": 172990616.09}, {"Empresa": "EMG", "Ano": 2018, "Parcela B (R$)": 223066155.85}, {"Empresa": "EMG", "Ano": 2019, "Parcela B (R$)": 231959145.25}, {"Empresa": "EMG", "Ano": 2020, "Parcela B (R$)": 236270599.99}, {"Empresa": "EMR", "Ano": 2022, "Parcela B (R$)": 347916931.0}, {"Empresa": "EMR", "Ano": 2023, "Parcela B (R$)": 385031271.34}, {"Empresa": "EMR", "Ano": 2024, "Parcela B (R$)": 417201401.0}, {"Empresa": "EMR", "Ano": 2025, "Parcela B (R$)": 436003939.05}, {"Empresa": "EMR", "Ano": 2026, "Parcela B (R$)": 457164463.19}, {"Empresa": "EMR", "Ano": 2027, "Parcela B (R$)": 485640259.1}, {"Empresa": "EMR", "Ano": 2028, "Parcela B (R$)": 549263341.88}, {"Empresa": "EMR", "Ano": 2029, "Parcela B (R$)": 577342060.58}, {"Empresa": "EMR", "Ano": 2030, "Parcela B (R$)": 606303630.09}, {"Empresa": "EMS", "Ano": 2018, "Parcela B (R$)": 826751430.57}, {"Empresa": "EMS", "Ano": 2019, "Parcela B (R$)": 937940830.12}, {"Empresa": "EMS", "Ano": 2020, "Parcela B (R$)": 1035079621.57}, {"Empresa": "EMS", "Ano": 2022, "Parcela B (R$)": 1582787660.0}, {"Empresa": "EMS", "Ano": 2023, "Parcela B (R$)": 1533109030.94}, {"Empresa": "EMS", "Ano": 2024, "Parcela B (R$)": 1590373843.72}, {"Empresa": "EMS", "Ano": 2025, "Parcela B (R$)": 1728931776.95}, {"Empresa": "EMS", "Ano": 2026, "Parcela B (R$)": 1729459029.61}, {"Empresa": "EMS", "Ano": 2027, "Parcela B (R$)": 1803601982.72}, {"Empresa": "EMS", "Ano": 2028, "Parcela B (R$)": 2141903418.42}, {"Empresa": "EMS", "Ano": 2029, "Parcela B (R$)": 2274570092.76}, {"Empresa": "EMS", "Ano": 2030, "Parcela B (R$)": 2418383745.57}, {"Empresa": "EMT", "Ano": 2018, "Parcela B (R$)": 1374488650.0}, {"Empresa": "EMT", "Ano": 2019, "Parcela B (R$)": 1518437778.88}, {"Empresa": "EMT", "Ano": 2020, "Parcela B (R$)": 1777158985.36}, {"Empresa": "EMT", "Ano": 2022, "Parcela B (R$)": 2665053858.0}, {"Empresa": "EMT", "Ano": 2023, "Parcela B (R$)": 2712612844.25}, {"Empresa": "EMT", "Ano": 2024, "Parcela B (R$)": 2804056410.0}, {"Empresa": "EMT", "Ano": 2025, "Parcela B (R$)": 2968437162.95}, {"Empresa": "EMT", "Ano": 2026, "Parcela B (R$)": 2949370269.35}, {"Empresa": "EMT", "Ano": 2027, "Parcela B (R$)": 3006601420.34}, {"Empresa": "EMT", "Ano": 2028, "Parcela B (R$)": 3227779816.81}, {"Empresa": "EMT", "Ano": 2029, "Parcela B (R$)": 3467098234.07}, {"Empresa": "EMT", "Ano": 2030, "Parcela B (R$)": 3730814454.81}, {"Empresa": "ENEL CE", "Ano": 2018, "Parcela B (R$)": 1349819313.08}, {"Empresa": "ENEL CE", "Ano": 2019, "Parcela B (R$)": 1583059446.56}, {"Empresa": "ENEL CE", "Ano": 2020, "Parcela B (R$)": 1751959115.92}, {"Empresa": "ENEL CE", "Ano": 2022, "Parcela B (R$)": 2742030583.0}, {"Empresa": "ENEL CE", "Ano": 2023, "Parcela B (R$)": 2717934047.03}, {"Empresa": "ENEL CE", "Ano": 2024, "Parcela B (R$)": 2760668563.0}, {"Empresa": "ENEL CE", "Ano": 2025, "Parcela B (R$)": 2998004432.4}, {"Empresa": "ENEL CE", "Ano": 2026, "Parcela B (R$)": 3030101952.09}, {"Empresa": "ENEL CE", "Ano": 2027, "Parcela B (R$)": 3576927824.1}, {"Empresa": "ENEL CE", "Ano": 2028, "Parcela B (R$)": 3785238697.61}, {"Empresa": "ENEL CE", "Ano": 2029, "Parcela B (R$)": 4017828965.46}, {"Empresa": "ENEL CE", "Ano": 2030, "Parcela B (R$)": 4278038928.26}, {"Empresa": "ENEL RJ", "Ano": 2018, "Parcela B (R$)": 1798891843.49}, {"Empresa": "ENEL RJ", "Ano": 2019, "Parcela B (R$)": 1832177891.96}, {"Empresa": "ENEL RJ", "Ano": 2020, "Parcela B (R$)": 1944732008.68}, {"Empresa": "ENEL RJ", "Ano": 2022, "Parcela B (R$)": 2212402241.0}, {"Empresa": "ENEL RJ", "Ano": 2023, "Parcela B (R$)": 2534370122.66}, {"Empresa": "ENEL RJ", "Ano": 2024, "Parcela B (R$)": 2823431305.0}, {"Empresa": "ENEL RJ", "Ano": 2025, "Parcela B (R$)": 3015872419.63}, {"Empresa": "ENEL RJ", "Ano": 2026, "Parcela B (R$)": 3157982798.12}, {"Empresa": "ENEL RJ", "Ano": 2027, "Parcela B (R$)": 3277101560.99}, {"Empresa": "ENEL RJ", "Ano": 2028, "Parcela B (R$)": 3466045039.25}, {"Empresa": "ENEL RJ", "Ano": 2029, "Parcela B (R$)": 3598384421.12}, {"Empresa": "ENEL RJ", "Ano": 2030, "Parcela B (R$)": 3754326393.75}, {"Empresa": "ENEL SP", "Ano": 2018, "Parcela B (R$)": 3216466828.58}, {"Empresa": "ENEL SP", "Ano": 2019, "Parcela B (R$)": 3749571085.44}, {"Empresa": "ENEL SP", "Ano": 2020, "Parcela B (R$)": 3977322959.44}, {"Empresa": "ENEL SP", "Ano": 2022, "Parcela B (R$)": 6306751984.0}, {"Empresa": "ENEL SP", "Ano": 2023, "Parcela B (R$)": 5732679278.24}, {"Empresa": "ENEL SP", "Ano": 2024, "Parcela B (R$)": 6369685338.0}, {"Empresa": "ENEL SP", "Ano": 2025, "Parcela B (R$)": 6672803962.66}, {"Empresa": "ENEL SP", "Ano": 2026, "Parcela B (R$)": 6822622648.32}, {"Empresa": "ENEL SP", "Ano": 2027, "Parcela B (R$)": 6125165519.34}, {"Empresa": "ENEL SP", "Ano": 2028, "Parcela B (R$)": 6330744198.41}, {"Empresa": "ENEL SP", "Ano": 2029, "Parcela B (R$)": 6540431386.37}, {"Empresa": "ENEL SP", "Ano": 2030, "Parcela B (R$)": 6785429115.52}, {"Empresa": "ENF", "Ano": 2018, "Parcela B (R$)": 47244152.82}, {"Empresa": "ENF", "Ano": 2019, "Parcela B (R$)": 48587358.6}, {"Empresa": "ENF", "Ano": 2020, "Parcela B (R$)": 49861561.95}, {"Empresa": "EPB", "Ano": 2018, "Parcela B (R$)": 682649121.78}, {"Empresa": "EPB", "Ano": 2019, "Parcela B (R$)": 753127323.18}, {"Empresa": "EPB", "Ano": 2020, "Parcela B (R$)": 820428387.52}, {"Empresa": "EPB Nova", "Ano": 2022, "Parcela B (R$)": 996352046.0}, {"Empresa": "EPB Nova", "Ano": 2023, "Parcela B (R$)": 955942780.92}, {"Empresa": "EPB Nova", "Ano": 2024, "Parcela B (R$)": 1114334397.0}, {"Empresa": "EPB Nova", "Ano": 2025, "Parcela B (R$)": 1273421092.83}, {"Empresa": "EPB Nova", "Ano": 2026, "Parcela B (R$)": 1297502806.32}, {"Empresa": "EPB Nova", "Ano": 2027, "Parcela B (R$)": 1340415911.39}, {"Empresa": "EPB Nova", "Ano": 2028, "Parcela B (R$)": 1389095680.49}, {"Empresa": "EPB Nova", "Ano": 2029, "Parcela B (R$)": 1545303826.92}, {"Empresa": "EPB Nova", "Ano": 2030, "Parcela B (R$)": 1647210718.7}, {"Empresa": "ERO", "Ano": 2018, "Parcela B (R$)": 392719254.24}, {"Empresa": "ERO", "Ano": 2019, "Parcela B (R$)": 407692529.04}, {"Empresa": "ERO", "Ano": 2020, "Parcela B (R$)": 654751237.88}, {"Empresa": "ERO", "Ano": 2021, "Parcela B (R$)": 696048795.0}, {"Empresa": "ERO", "Ano": 2022, "Parcela B (R$)": 784665476.0}, {"Empresa": "ERO", "Ano": 2023, "Parcela B (R$)": 1026209560.14}, {"Empresa": "ERO", "Ano": 2024, "Parcela B (R$)": 1163456714.56}, {"Empresa": "ERO", "Ano": 2025, "Parcela B (R$)": 1220948169.0}, {"Empresa": "ERO", "Ano": 2026, "Parcela B (R$)": 1285523083.21}, {"Empresa": "ERO", "Ano": 2027, "Parcela B (R$)": 1355531612.83}, {"Empresa": "ERO", "Ano": 2028, "Parcela B (R$)": 1606585155.31}, {"Empresa": "ERO", "Ano": 2029, "Parcela B (R$)": 1722015833.34}, {"Empresa": "ESE", "Ano": 2018, "Parcela B (R$)": 394404155.05}, {"Empresa": "ESE", "Ano": 2019, "Parcela B (R$)": 431306252.6}, {"Empresa": "ESE", "Ano": 2020, "Parcela B (R$)": 462046150.28}, {"Empresa": "ESE", "Ano": 2022, "Parcela B (R$)": 672726400.0}, {"Empresa": "ESE", "Ano": 2023, "Parcela B (R$)": 612753107.16}, {"Empresa": "ESE", "Ano": 2024, "Parcela B (R$)": 619420864.0}, {"Empresa": "ESE", "Ano": 2025, "Parcela B (R$)": 681637158.33}, {"Empresa": "ESE", "Ano": 2026, "Parcela B (R$)": 689622027.27}, {"Empresa": "ESE", "Ano": 2027, "Parcela B (R$)": 705092717.67}, {"Empresa": "ESE", "Ano": 2028, "Parcela B (R$)": 811603344.27}, {"Empresa": "ESE", "Ano": 2029, "Parcela B (R$)": 844769921.55}, {"Empresa": "ESE", "Ano": 2030, "Parcela B (R$)": 883009437.39}, {"Empresa": "ESS", "Ano": 2018, "Parcela B (R$)": 383470240.79}, {"Empresa": "ESS", "Ano": 2019, "Parcela B (R$)": 399997973.45}, {"Empresa": "ESS", "Ano": 2020, "Parcela B (R$)": 399876741.79}, {"Empresa": "ESS", "Ano": 2022, "Parcela B (R$)": 499585097.0}, {"Empresa": "ESS", "Ano": 2023, "Parcela B (R$)": 503233844.0}, {"Empresa": "ESS", "Ano": 2024, "Parcela B (R$)": 601137561.0}, {"Empresa": "ESS", "Ano": 2025, "Parcela B (R$)": 624333752.44}, {"Empresa": "ESS", "Ano": 2026, "Parcela B (R$)": 715469530.41}, {"Empresa": "ESS", "Ano": 2027, "Parcela B (R$)": 750580587.99}, {"Empresa": "ESS", "Ano": 2028, "Parcela B (R$)": 787762954.53}, {"Empresa": "ESS", "Ano": 2029, "Parcela B (R$)": 825994693.81}, {"Empresa": "ESS", "Ano": 2030, "Parcela B (R$)": 868827682.81}, {"Empresa": "ETO", "Ano": 2018, "Parcela B (R$)": 497289660.76}, {"Empresa": "ETO", "Ano": 2019, "Parcela B (R$)": 542800528.05}, {"Empresa": "ETO", "Ano": 2020, "Parcela B (R$)": 641585525.83}, {"Empresa": "ETO", "Ano": 2022, "Parcela B (R$)": 802987062.0}, {"Empresa": "ETO", "Ano": 2023, "Parcela B (R$)": 888897656.0}, {"Empresa": "ETO", "Ano": 2024, "Parcela B (R$)": 1044722810.0}, {"Empresa": "ETO", "Ano": 2025, "Parcela B (R$)": 1182689867.41}, {"Empresa": "ETO", "Ano": 2026, "Parcela B (R$)": 1254528768.73}, {"Empresa": "ETO", "Ano": 2027, "Parcela B (R$)": 1346997255.06}, {"Empresa": "ETO", "Ano": 2028, "Parcela B (R$)": 1445671622.83}, {"Empresa": "ETO", "Ano": 2029, "Parcela B (R$)": 1559692023.08}, {"Empresa": "ETO", "Ano": 2030, "Parcela B (R$)": 1789800109.4}, {"Empresa": "Equatorial AL", "Ano": 2018, "Parcela B (R$)": 474618914.35}, {"Empresa": "Equatorial AL", "Ano": 2019, "Parcela B (R$)": 466287522.24}, {"Empresa": "Equatorial AL", "Ano": 2020, "Parcela B (R$)": 641852249.31}, {"Empresa": "Equatorial AL", "Ano": 2022, "Parcela B (R$)": 799023844.0}, {"Empresa": "Equatorial AL", "Ano": 2023, "Parcela B (R$)": 855952788.0}, {"Empresa": "Equatorial AL", "Ano": 2024, "Parcela B (R$)": 973699151.38}, {"Empresa": "Equatorial AL", "Ano": 2025, "Parcela B (R$)": 1047136190.98}, {"Empresa": "Equatorial AL", "Ano": 2026, "Parcela B (R$)": 1048039707.23}, {"Empresa": "Equatorial AL", "Ano": 2027, "Parcela B (R$)": 1050381733.1}, {"Empresa": "Equatorial AL", "Ano": 2028, "Parcela B (R$)": 1062036598.42}, {"Empresa": "Equatorial AL", "Ano": 2029, "Parcela B (R$)": 1294672967.3}, {"Empresa": "Equatorial AL", "Ano": 2030, "Parcela B (R$)": 1334324629.04}, {"Empresa": "Equatorial AP", "Ano": 2022, "Parcela B (R$)": 1794094985.0}, {"Empresa": "Equatorial GO", "Ano": 2018, "Parcela B (R$)": 1549634411.86}, {"Empresa": "Equatorial GO", "Ano": 2019, "Parcela B (R$)": 1644178684.59}, {"Empresa": "Equatorial GO", "Ano": 2020, "Parcela B (R$)": 1753528256.86}, {"Empresa": "Equatorial GO", "Ano": 2021, "Parcela B (R$)": 2028077769.0}, {"Empresa": "Equatorial GO", "Ano": 2022, "Parcela B (R$)": 2217364238.0}, {"Empresa": "Equatorial GO", "Ano": 2023, "Parcela B (R$)": 3094593554.23}, {"Empresa": "Equatorial GO", "Ano": 2024, "Parcela B (R$)": 3568058811.0}, {"Empresa": "Equatorial GO", "Ano": 2025, "Parcela B (R$)": 3689120310.89}, {"Empresa": "Equatorial GO", "Ano": 2026, "Parcela B (R$)": 3834838510.61}, {"Empresa": "Equatorial GO", "Ano": 2027, "Parcela B (R$)": 4014049761.59}, {"Empresa": "Equatorial GO", "Ano": 2028, "Parcela B (R$)": 5068823890.09}, {"Empresa": "Equatorial GO", "Ano": 2029, "Parcela B (R$)": 5435178045.33}, {"Empresa": "Equatorial MA", "Ano": 2018, "Parcela B (R$)": 1403026232.99}, {"Empresa": "Equatorial MA", "Ano": 2019, "Parcela B (R$)": 1473020968.44}, {"Empresa": "Equatorial MA", "Ano": 2020, "Parcela B (R$)": 1641903297.94}, {"Empresa": "Equatorial MA", "Ano": 2023, "Parcela B (R$)": 1781669900.0}, {"Empresa": "Equatorial MA", "Ano": 2024, "Parcela B (R$)": 2112260654.0}, {"Empresa": "Equatorial MA", "Ano": 2025, "Parcela B (R$)": 2493965994.08}, {"Empresa": "Equatorial MA", "Ano": 2026, "Parcela B (R$)": 2602413021.82}, {"Empresa": "Equatorial MA", "Ano": 2027, "Parcela B (R$)": 2742092592.4}, {"Empresa": "Equatorial MA", "Ano": 2028, "Parcela B (R$)": 2901369191.03}, {"Empresa": "Equatorial MA", "Ano": 2029, "Parcela B (R$)": 3240357881.11}, {"Empresa": "Equatorial MA", "Ano": 2030, "Parcela B (R$)": 3499770169.29}, {"Empresa": "Equatorial PA", "Ano": 2018, "Parcela B (R$)": 1677777464.9}, {"Empresa": "Equatorial PA", "Ano": 2019, "Parcela B (R$)": 1789115809.13}, {"Empresa": "Equatorial PA", "Ano": 2020, "Parcela B (R$)": 2059159218.16}, {"Empresa": "Equatorial PA", "Ano": 2022, "Parcela B (R$)": 3414508138.23}, {"Empresa": "Equatorial PA", "Ano": 2023, "Parcela B (R$)": 3294234076.27}, {"Empresa": "Equatorial PA", "Ano": 2024, "Parcela B (R$)": 3609817238.0}, {"Empresa": "Equatorial PA", "Ano": 2025, "Parcela B (R$)": 3709042069.88}, {"Empresa": "Equatorial PA", "Ano": 2026, "Parcela B (R$)": 3694813869.85}, {"Empresa": "Equatorial PA", "Ano": 2027, "Parcela B (R$)": 3829591042.19}, {"Empresa": "Equatorial PA", "Ano": 2028, "Parcela B (R$)": 4104598229.43}, {"Empresa": "Equatorial PA", "Ano": 2029, "Parcela B (R$)": 4415494424.8}, {"Empresa": "Equatorial PA", "Ano": 2030, "Parcela B (R$)": 4770385570.04}, {"Empresa": "Equatorial PI", "Ano": 2018, "Parcela B (R$)": 498604387.27}, {"Empresa": "Equatorial PI", "Ano": 2019, "Parcela B (R$)": 522336390.76}, {"Empresa": "Equatorial PI", "Ano": 2020, "Parcela B (R$)": 847371043.95}, {"Empresa": "Equatorial PI", "Ano": 2021, "Parcela B (R$)": 1001267704.0}, {"Empresa": "Equatorial PI", "Ano": 2022, "Parcela B (R$)": 1015493344.0}, {"Empresa": "Equatorial PI", "Ano": 2023, "Parcela B (R$)": 1249065599.64}, {"Empresa": "Equatorial PI", "Ano": 2024, "Parcela B (R$)": 1346495319.86}, {"Empresa": "Equatorial PI", "Ano": 2025, "Parcela B (R$)": 1412583463.6}, {"Empresa": "Equatorial PI", "Ano": 2026, "Parcela B (R$)": 1476922722.28}, {"Empresa": "Equatorial PI", "Ano": 2027, "Parcela B (R$)": 1555680559.6}, {"Empresa": "Equatorial PI", "Ano": 2028, "Parcela B (R$)": 1944129820.5}, {"Empresa": "Equatorial PI", "Ano": 2029, "Parcela B (R$)": 2104376836.01}, {"Empresa": "FORCEL", "Ano": 2018, "Parcela B (R$)": 5701025.31}, {"Empresa": "FORCEL", "Ano": 2019, "Parcela B (R$)": 5849318.83}, {"Empresa": "FORCEL", "Ano": 2020, "Parcela B (R$)": 5764858.5}, {"Empresa": "FORCEL", "Ano": 2022, "Parcela B (R$)": 6040700.0}, {"Empresa": "FORCEL", "Ano": 2023, "Parcela B (R$)": 7362112.0}, {"Empresa": "FORCEL", "Ano": 2024, "Parcela B (R$)": 8669114.0}, {"Empresa": "FORCEL", "Ano": 2025, "Parcela B (R$)": 9008357.98}, {"Empresa": "FORCEL", "Ano": 2026, "Parcela B (R$)": 7954963.58}, {"Empresa": "FORCEL", "Ano": 2027, "Parcela B (R$)": 7971767.46}, {"Empresa": "FORCEL", "Ano": 2028, "Parcela B (R$)": 7969705.82}, {"Empresa": "FORCEL", "Ano": 2029, "Parcela B (R$)": 7979164.17}, {"Empresa": "FORCEL", "Ano": 2030, "Parcela B (R$)": 8011738.75}, {"Empresa": "HIDROPAN", "Ano": 2018, "Parcela B (R$)": 13321878.3}, {"Empresa": "HIDROPAN", "Ano": 2019, "Parcela B (R$)": 13618965.2}, {"Empresa": "HIDROPAN", "Ano": 2020, "Parcela B (R$)": 13590256.29}, {"Empresa": "HIDROPAN", "Ano": 2022, "Parcela B (R$)": 15266235.38}, {"Empresa": "HIDROPAN", "Ano": 2023, "Parcela B (R$)": 16655763.0}, {"Empresa": "HIDROPAN", "Ano": 2024, "Parcela B (R$)": 19335611.0}, {"Empresa": "HIDROPAN", "Ano": 2025, "Parcela B (R$)": 20426015.29}, {"Empresa": "HIDROPAN", "Ano": 2026, "Parcela B (R$)": 21184015.25}, {"Empresa": "HIDROPAN", "Ano": 2027, "Parcela B (R$)": 19529604.99}, {"Empresa": "HIDROPAN", "Ano": 2028, "Parcela B (R$)": 20125428.66}, {"Empresa": "HIDROPAN", "Ano": 2029, "Parcela B (R$)": 20757124.65}, {"Empresa": "HIDROPAN", "Ano": 2030, "Parcela B (R$)": 21505115.26}, {"Empresa": "LIGHT", "Ano": 2018, "Parcela B (R$)": 2645457350.64}, {"Empresa": "LIGHT", "Ano": 2019, "Parcela B (R$)": 2777548271.01}, {"Empresa": "LIGHT", "Ano": 2020, "Parcela B (R$)": 2827389001.77}, {"Empresa": "LIGHT", "Ano": 2022, "Parcela B (R$)": 3268613559.22}, {"Empresa": "LIGHT", "Ano": 2023, "Parcela B (R$)": 3441349548.0}, {"Empresa": "LIGHT", "Ano": 2024, "Parcela B (R$)": 3696764366.0}, {"Empresa": "LIGHT", "Ano": 2025, "Parcela B (R$)": 4031272471.02}, {"Empresa": "LIGHT", "Ano": 2026, "Parcela B (R$)": 4234065512.83}, {"Empresa": "LIGHT", "Ano": 2027, "Parcela B (R$)": 4053572081.18}, {"Empresa": "LIGHT", "Ano": 2028, "Parcela B (R$)": 4149870227.23}, {"Empresa": "LIGHT", "Ano": 2029, "Parcela B (R$)": 4248162077.08}, {"Empresa": "LIGHT", "Ano": 2030, "Parcela B (R$)": 4360315731.44}, {"Empresa": "MUX-Energia", "Ano": 2018, "Parcela B (R$)": 5536311.29}, {"Empresa": "MUX-Energia", "Ano": 2019, "Parcela B (R$)": 5341802.08}, {"Empresa": "MUX-Energia", "Ano": 2020, "Parcela B (R$)": 5372559.46}, {"Empresa": "MUX-Energia", "Ano": 2022, "Parcela B (R$)": 5836168.69}, {"Empresa": "MUX-Energia", "Ano": 2023, "Parcela B (R$)": 6139047.0}, {"Empresa": "MUX-Energia", "Ano": 2024, "Parcela B (R$)": 6849044.0}, {"Empresa": "MUX-Energia", "Ano": 2025, "Parcela B (R$)": 7183776.07}, {"Empresa": "MUX-Energia", "Ano": 2026, "Parcela B (R$)": 7515681.02}, {"Empresa": "MUX-Energia", "Ano": 2027, "Parcela B (R$)": 7797370.16}, {"Empresa": "MUX-Energia", "Ano": 2028, "Parcela B (R$)": 8164582.68}, {"Empresa": "MUX-Energia", "Ano": 2029, "Parcela B (R$)": 8546890.72}, {"Empresa": "MUX-Energia", "Ano": 2030, "Parcela B (R$)": 8947171.23}, {"Empresa": "NDB", "Ano": 2018, "Parcela B (R$)": 491156706.48}, {"Empresa": "NDB", "Ano": 2019, "Parcela B (R$)": 515727672.55}, {"Empresa": "NDB", "Ano": 2020, "Parcela B (R$)": 526859621.27}, {"Empresa": "NDB", "Ano": 2021, "Parcela B (R$)": 553128746.48}, {"Empresa": "NDB", "Ano": 2022, "Parcela B (R$)": 583701921.0}, {"Empresa": "NDB", "Ano": 2023, "Parcela B (R$)": 616237795.0}, {"Empresa": "NDB", "Ano": 2024, "Parcela B (R$)": 674806132.0}, {"Empresa": "NDB", "Ano": 2025, "Parcela B (R$)": 688744037.14}, {"Empresa": "NDB", "Ano": 2026, "Parcela B (R$)": 778663808.62}, {"Empresa": "NDB", "Ano": 2027, "Parcela B (R$)": 815043489.02}, {"Empresa": "NDB", "Ano": 2028, "Parcela B (R$)": 853736491.73}, {"Empresa": "NDB", "Ano": 2029, "Parcela B (R$)": 897269653.74}, {"Empresa": "RGE", "Ano": 2018, "Parcela B (R$)": 1025688432.92}, {"Empresa": "RGE Nova", "Ano": 2019, "Parcela B (R$)": 2125642224.3}, {"Empresa": "RGE Nova", "Ano": 2020, "Parcela B (R$)": 2310061416.09}, {"Empresa": "RGE Nova", "Ano": 2022, "Parcela B (R$)": 3518620793.0}, {"Empresa": "RGE Nova", "Ano": 2023, "Parcela B (R$)": 3570316370.17}, {"Empresa": "RGE Nova", "Ano": 2024, "Parcela B (R$)": 3616984118.0}, {"Empresa": "RGE Nova", "Ano": 2025, "Parcela B (R$)": 3949946932.68}, {"Empresa": "RGE Nova", "Ano": 2026, "Parcela B (R$)": 4006555317.23}, {"Empresa": "RGE Nova", "Ano": 2027, "Parcela B (R$)": 4142522413.95}, {"Empresa": "RGE Nova", "Ano": 2028, "Parcela B (R$)": 4500928216.92}, {"Empresa": "RGE Nova", "Ano": 2029, "Parcela B (R$)": 4707102798.74}, {"Empresa": "RGE Nova", "Ano": 2030, "Parcela B (R$)": 4920108945.3}, {"Empresa": "RGE Sul", "Ano": 2018, "Parcela B (R$)": 851895418.92}, {"Empresa": "RR Energia", "Ano": 2018, "Parcela B (R$)": 155499760.96}, {"Empresa": "RR Energia", "Ano": 2019, "Parcela B (R$)": 153474743.7}, {"Empresa": "RR Energia", "Ano": 2020, "Parcela B (R$)": 190096815.7}, {"Empresa": "RR Energia", "Ano": 2022, "Parcela B (R$)": 264654953.0}, {"Empresa": "RR Energia", "Ano": 2023, "Parcela B (R$)": 264654953.0}, {"Empresa": "RR Energia", "Ano": 2024, "Parcela B (R$)": 223741944.2}, {"Empresa": "RR Energia", "Ano": 2025, "Parcela B (R$)": 238633051.38}, {"Empresa": "RR Energia", "Ano": 2026, "Parcela B (R$)": 229067886.07}, {"Empresa": "RR Energia", "Ano": 2027, "Parcela B (R$)": 224929331.22}, {"Empresa": "RR Energia", "Ano": 2028, "Parcela B (R$)": 220803300.17}, {"Empresa": "RR Energia", "Ano": 2029, "Parcela B (R$)": 306759280.55}, {"Empresa": "RR Energia", "Ano": 2030, "Parcela B (R$)": 304813012.65}, {"Empresa": "SULGIPE", "Ano": 2018, "Parcela B (R$)": 62392727.82}, {"Empresa": "SULGIPE", "Ano": 2019, "Parcela B (R$)": 66483456.0}, {"Empresa": "SULGIPE", "Ano": 2020, "Parcela B (R$)": 67727802.56}, {"Empresa": "SULGIPE", "Ano": 2022, "Parcela B (R$)": 81436321.92}, {"Empresa": "SULGIPE", "Ano": 2023, "Parcela B (R$)": 87719467.0}, {"Empresa": "SULGIPE", "Ano": 2024, "Parcela B (R$)": 100080795.0}, {"Empresa": "SULGIPE", "Ano": 2025, "Parcela B (R$)": 107248244.62}, {"Empresa": "SULGIPE", "Ano": 2026, "Parcela B (R$)": 112816629.81}, {"Empresa": "SULGIPE", "Ano": 2027, "Parcela B (R$)": 113656855.09}, {"Empresa": "SULGIPE", "Ano": 2028, "Parcela B (R$)": 117945636.3}, {"Empresa": "SULGIPE", "Ano": 2029, "Parcela B (R$)": 122490799.33}, {"Empresa": "SULGIPE", "Ano": 2030, "Parcela B (R$)": 127801449.98}, {"Empresa": "UHENPAL", "Ano": 2018, "Parcela B (R$)": 10204067.34}, {"Empresa": "UHENPAL", "Ano": 2019, "Parcela B (R$)": 11665681.7}, {"Empresa": "UHENPAL", "Ano": 2020, "Parcela B (R$)": 13583543.11}, {"Empresa": "UHENPAL", "Ano": 2022, "Parcela B (R$)": 15957830.32}, {"Empresa": "UHENPAL", "Ano": 2023, "Parcela B (R$)": 17906501.0}, {"Empresa": "UHENPAL", "Ano": 2024, "Parcela B (R$)": 18382577.0}, {"Empresa": "UHENPAL", "Ano": 2025, "Parcela B (R$)": 19560793.96}, {"Empresa": "UHENPAL", "Ano": 2026, "Parcela B (R$)": 20413838.41}, {"Empresa": "UHENPAL", "Ano": 2027, "Parcela B (R$)": 20588803.29}, {"Empresa": "UHENPAL", "Ano": 2028, "Parcela B (R$)": 21205542.41}, {"Empresa": "UHENPAL", "Ano": 2029, "Parcela B (R$)": 21927109.38}, {"Empresa": "UHENPAL", "Ano": 2030, "Parcela B (R$)": 22658530.11}];
+
+function matchName(longName) {
+    const n = longName.toUpperCase();
+    if (n.includes("ENEL SP") || n.includes("ELETROPAULO")) return "ENEL SP";
+    if (n.includes("ENEL RJ") || n.includes("AMPLA")) return "ENEL RJ";
+    if (n.includes("ENEL CE")) return "ENEL CE";
+    if (n.includes("CELG") || n.includes("EQUATORIAL GO")) return "Equatorial GO";
+    if (n.includes("CELPA")) return "Equatorial PA";
+    if (n.includes("EQUATORIAL MA")) return "Equatorial MA";
+    if (n.includes("EQUATORIAL AL")) return "Equatorial AL";
+    if (n.includes("EQUATORIAL PI")) return "Equatorial PI";
+    if (n.includes("CEEE")) return "CEEE";
+    if (n.includes("CEMIG")) return "CEMIG";
+    if (n.includes("CPFL PAULISTA")) return "CPFL-Paulista";
+    if (n.includes("PIRATININGA")) return "CPFL-Piratininga";
+    if (n.includes("LIGHT")) return "LIGHT";
+    if (n.includes("CELPE")) return "CELPE";
+    if (n.includes("COELBA")) return "COELBA";
+    if (n.includes("ELEKTRO")) return "ELEKTRO";
+    if (n.includes("COPEL")) return "COPEL";
+    if (n.includes("CELESC")) return "CELESC";
+    if (n.includes("(EMT)")) return "EMT";
+    if (n.includes("(EMS)")) return "EMS";
+    if (n.includes("(EMR)")) return "EMR";
+    if (n.includes("(ETO)")) return "ETO";
+    if (n.includes("(CERON)")) return "ERO";
+    if (n.includes("(ESS)")) return "ESS";
+    if (n.includes("(ESE)")) return "ESE";
+    if (n.includes("(CEB)")) return "NDB";
+    if (n.includes("CEA")) return "CEA";
+    if (n.includes("RGE SUL")) return "RGE Sul";
+    if (n.includes("RGE")) return "RGE Nova";
+    if (n.includes("EDP SP")) return "EDP SP";
+    if (n.includes("EDP ES")) return "EDP ES";
+    if (n.includes("SULGIPE")) return "SULGIPE";
+    if (n.includes("CHESP")) return "CHESP";
+    if (n.includes("DEMEI")) return "DEMEI";
+    if (n.includes("NOVA PALMA")) return "UHENPAL";
+    return longName.split(" (")[0].trim();
+}
+
+let csvRowsPct = [];
+
+function renderPct() {
+    const tbody = document.getElementById('table-body-pct');
+    tbody.innerHTML = '';
+    csvRowsPct = [];
+    
+    let totalMultas = 0;
+    let totalPB = 0;
+    let globalImpacts = [];
+
+    penaltiesRawPct.forEach(p => {
+        const tr = document.createElement('tr');
+        let rowHtml = `<td class="col-name">${p.nome}</td>
+                       <td class="col-grupo">${p.grupo}</td>`;
+        
+        let rowImpacts = [];
+        let csvRow = { Distribuidora: p.nome, Grupo: p.grupo };
+
+        ANOS_PCT.forEach(y => {
+            const multaMi = p[y] ? p[y][1] : 0;
+            const pbMatch = pbDataPct.find(d => d.Empresa === matchName(p.nome) && d.Ano == y);
+
+            if (pbMatch && (multaMi > 0 || (p[y] && y === '2026'))) {
+                const pbMi = pbMatch["Parcela B (R$)"] / 1000000;
+                const ratio = (multaMi / pbMi) * 100;
+                
+                if (multaMi > 0) {
+                    rowImpacts.push(ratio);
+                    globalImpacts.push(ratio);
+                    totalMultas += multaMi;
+                    totalPB += pbMi;
+                }
+
+                const cls = ratio > 2 ? 'impact-high' : (ratio > 0.5 ? 'impact-mid' : 'impact-low');
+                const pctTxt = multaMi > 0 ? ratio.toFixed(4)+'%' : 'Em análise';
+
+                rowHtml += `<td class="cell-trio">
+                    <span class="cell-num">R$ ${multaMi.toFixed(2)} Mi</span>
+                    <span class="cell-den">${pbMi.toFixed(1)} Mi PB</span>
+                    <span class="cell-pct ${cls}">${pctTxt}</span>
+                </td>`;
+
+                csvRow[`Multa ${y} (R$ Mi)`] = multaMi > 0 ? multaMi.toFixed(4) : '';
+                csvRow[`PB ${y} (R$ Mi)`] = pbMi.toFixed(4);
+                csvRow[`Impacto ${y} (%)`] = multaMi > 0 ? ratio.toFixed(4) : '';
+            } else {
+                rowHtml += `<td style="color:#ccc; font-size:9px;">—</td>`;
+                csvRow[`Multa ${y} (R$ Mi)`] = '';
+                csvRow[`PB ${y} (R$ Mi)`] = '';
+                csvRow[`Impacto ${y} (%)`] = '';
+            }
+        });
+
+        const avg = rowImpacts.length ? (rowImpacts.reduce((a,b)=>a+b,0)/rowImpacts.length) : 0;
+        rowHtml += `<td class="font-black bg-slate-50 text-center" style="font-size:10px;">${avg > 0 ? avg.toFixed(4)+'%' : '—'}</td>`;
+        csvRow['Média Impacto (%)'] = avg > 0 ? avg.toFixed(4) : '';
+
+        tr.innerHTML = rowHtml;
+        tbody.appendChild(tr);
+        csvRowsPct.push(csvRow);
+    });
+
+    document.getElementById('kpi-total-cos-pct').innerText = penaltiesRawPct.length;
+    document.getElementById('kpi-avg-impact-pct').innerText = (globalImpacts.reduce((a,b)=>a+b,0)/globalImpacts.length).toFixed(2) + "%";
+    document.getElementById('kpi-total-multas-pct').innerText = "R$ " + totalMultas.toFixed(1) + " Mi";
+    document.getElementById('kpi-total-pb-pct').innerText = "R$ " + (totalPB/1000).toFixed(1) + " Bi";
+}
+
+
+function exportCSVpct() {
+    if (!csvRowsPct.length) return;
+    const headers = Object.keys(csvRowsPct[0]);
+    const lines = [headers.join(';')];
+    csvRowsPct.forEach(r => {
+        const row = headers.map(h => {
+            const val = r[h] ?? '';
+            // Se for string e contiver ponto (decimal), substitui por vírgula para Excel PT-BR
+            return (typeof val === 'string' && val.includes('.')) ? val.replace('.', ',') : val;
+        });
+        lines.push(row.join(';'));
+    });
+    const blob = new Blob(["﻿" + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'impacto_regulatorio_parcela_b.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+renderPct();
+
+
+/* ── Scripts UCs ── */
+
+const ANOS_UCS = ['2018','2019','2020','2021','2022','2023','2024','2025','2026'];
+
+const penaltiesRawUcs = [{"nome": "ENEL SP (Eletropaulo)", "grupo": "ENEL", "2018": [1, 38.526687], "2019": null, "2020": [1, 13.512333], "2022": [2, 112.118091], "2024": null, "2025": [2, 165.807883], "2026": [1, 0.0]}, {"nome": "Equatorial GO", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": null, "2025": [3, 123.358121], "2026": null}, {"nome": "CELG-D", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 7.915238], "2020": [1, 44.171531], "2022": null, "2024": null, "2025": [2, 72.479756], "2026": null}, {"nome": "ENEL RJ (Ampla)", "grupo": "ENEL", "2018": null, "2019": null, "2020": null, "2022": [1, 17.011037], "2024": null, "2025": [1, 54.054199], "2026": [1, 0.0]}, {"nome": "Light RJ", "grupo": "LIGHT", "2018": null, "2019": null, "2020": [2, 21.981843], "2022": null, "2024": null, "2025": [3, 56.788565], "2026": [1, 0.0]}, {"nome": "ENEL CE", "grupo": "ENEL", "2018": [1, 0.260279], "2019": null, "2020": [1, 26.019275], "2022": [1, 35.916136], "2024": [1, 28.550163], "2025": null, "2026": null}, {"nome": "Equatorial RS (CEEE-D)", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 1.148082], "2020": null, "2022": [1, 3.452604], "2024": [2, 54.345234], "2025": [2, 0.0], "2026": [1, 0.0]}, {"nome": "Equatorial MA", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 0.298888], "2020": null, "2022": [1, 27.453201], "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Paulista", "grupo": "CPFL", "2018": null, "2019": null, "2020": null, "2022": [1, 9.95248], "2024": [1, 48.277709], "2025": null, "2026": null}, {"nome": "RGE Sul", "grupo": "CPFL", "2018": null, "2019": null, "2020": [1, 40.164063], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia PE (CELPE)", "grupo": "NEOENERGIA", "2018": [1, 1.689893], "2019": [1, 2.925092], "2020": [1, 7.90888], "2022": null, "2024": [1, 32.949775], "2025": null, "2026": null}, {"nome": "Neoenergia BA (COELBA)", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 24.089829], "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia Elektro", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 22.472278], "2024": null, "2025": null, "2026": null}, {"nome": "CELESC", "grupo": "CELESC", "2018": null, "2019": [1, 3.379013], "2020": [1, 13.996524], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CEMIG-D", "grupo": "CEMIG", "2018": [1, 15.075127], "2019": null, "2020": null, "2022": null, "2024": null, "2025": [3, 0.0], "2026": [1, 0.0]}, {"nome": "EDP SP", "grupo": "EDP", "2018": null, "2019": null, "2020": null, "2022": [1, 18.111882], "2024": [1, 16.021419], "2025": null, "2026": null}, {"nome": "ENERGISA MT (EMT)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": [2, 8.421441], "2022": [1, 37.280176], "2024": null, "2025": null, "2026": null}, {"nome": "Equatorial AL", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [3, 14.134885], "2025": [1, 0.0], "2026": [1, 0.0]}, {"nome": "Equatorial PI", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 10.556488], "2025": null, "2026": null}, {"nome": "COPEL-DIS", "grupo": "COPEL", "2018": null, "2019": null, "2020": [1, 1.911211], "2022": null, "2024": [1, 6.386919], "2025": [1, 0.0], "2026": null}, {"nome": "CEA", "grupo": "EQUATORIAL", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 8.343522], "2025": null, "2026": null}, {"nome": "EDP ES", "grupo": "EDP", "2018": null, "2019": [1, 0.060363], "2020": [1, 3.708667], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA MS (EMS)", "grupo": "ENERGISA", "2018": null, "2019": [1, 0.813956], "2020": [1, 1.749501], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA MR (EMR)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": [1, 2.456218], "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA TO (ETO)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": [1, 3.416596], "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA RO (CERON)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": null, "2022": null, "2024": [1, 4.443841], "2025": null, "2026": null}, {"nome": "CELPA", "grupo": "EQUATORIAL", "2018": null, "2019": [1, 2.156657], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Leste Paulista", "grupo": "CPFL", "2018": null, "2019": [1, 0.015116], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Sul Paulista", "grupo": "CPFL", "2018": null, "2019": [1, 0.046191], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Jaguari", "grupo": "CPFL", "2018": [1, 0.0], "2019": null, "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CPFL Piratininga", "grupo": "CPFL", "2018": [1, 0.0], "2019": null, "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Neoenergia DF (CEB)", "grupo": "NEOENERGIA", "2018": null, "2019": null, "2020": null, "2022": [1, 1.408462], "2024": null, "2025": [2, 0.0], "2026": null}, {"nome": "ENERGISA SS (ESS)", "grupo": "ENERGISA", "2018": null, "2019": [1, 0.546585], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "ENERGISA SE (ESE)", "grupo": "ENERGISA", "2018": null, "2019": null, "2020": [1, 1.68761], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Sulgipe", "grupo": "SULGIPE", "2018": null, "2019": null, "2020": [1, 0.011668], "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "CHESP", "grupo": "CHESP", "2018": null, "2019": [1, 0.004563], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "DEMEI", "grupo": "DEMEI", "2018": null, "2019": [1, 0.000115], "2020": null, "2022": null, "2024": null, "2025": null, "2026": null}, {"nome": "Nova Palma Energia", "grupo": "NOVA PALMA", "2018": null, "2019": null, "2020": [1, 0.0], "2022": null, "2024": null, "2025": null, "2026": null}];
+const ucsDataUcs = [{"SigMesAno": "Distribuidora", "Dez/2025": "Número de Consumidores", "Dez/2024": "Número de Consumidores", "Dez/2023": "Número de Consumidores", "Dez/2022": "Número de Consumidores", "Dez/2021": "Número de Consumidores", "Dez/2020": "Número de Consumidores", "Dez/2018": "Número de Consumidores", "Dez/2019": "Número de Consumidores"}, {"SigMesAno": "Amazonas Energia", "Dez/2025": 1041946, "Dez/2024": 1026172, "Dez/2023": 1010590, "Dez/2022": 980232, "Dez/2021": 949406, "Dez/2020": 1043495}, {"SigMesAno": "CEA Equatorial", "Dez/2025": 265637, "Dez/2024": 235046, "Dez/2023": 216655, "Dez/2022": 196996, "Dez/2021": 197775, "Dez/2020": 208234}, {"SigMesAno": "CEEE Equatorial", "Dez/2025": 1922325, "Dez/2024": 1891386, "Dez/2023": 1856763, "Dez/2022": 1824882, "Dez/2021": 1773994, "Dez/2020": 1759947, "Dez/2019": 1734258}, {"SigMesAno": "Celesc-Dis", "Dez/2025": 3297555, "Dez/2024": 3173363, "Dez/2023": 3230635, "Dez/2022": 3212104, "Dez/2021": 3175996, "Dez/2020": 3106989, "Dez/2019": 3024603}, {"SigMesAno": "Cemig-D", "Dez/2025": 8667895, "Dez/2024": 8576520, "Dez/2023": 8476104, "Dez/2022": 8520680, "Dez/2021": 8584651, "Dez/2020": 8578381, "Dez/2018": 8378950}, {"SigMesAno": "Cerej", "Dez/2025": 16382, "Dez/2024": 15851, "Dez/2023": NaN, "Dez/2022": 14814, "Dez/2021": 14560, "Dez/2020": 14081}, {"SigMesAno": "Ceres", "Dez/2025": 6031, "Dez/2024": 5929, "Dez/2023": 5734, "Dez/2022": 5724, "Dez/2021": 5531, "Dez/2020": 5329}, {"SigMesAno": "Cerfox", "Dez/2025": 15356, "Dez/2024": 15269, "Dez/2023": 15265, "Dez/2022": 15450, "Dez/2021": 15716, "Dez/2020": NaN}, {"SigMesAno": "Cerim", "Dez/2025": 16708, "Dez/2024": 15936, "Dez/2023": 15251, "Dez/2022": 14714, "Dez/2021": 14038, "Dez/2020": 12822}, {"SigMesAno": "Ceripa", "Dez/2025": 14355, "Dez/2024": 13817, "Dez/2023": 13151, "Dez/2022": 12910, "Dez/2021": 12445, "Dez/2020": 11797}, {"SigMesAno": "Cerpalo", "Dez/2025": 17150, "Dez/2024": 16562, "Dez/2023": 15893, "Dez/2022": 15501, "Dez/2021": 15180, "Dez/2020": 14566}, {"SigMesAno": "Cetril", "Dez/2025": 33256, "Dez/2024": 32262, "Dez/2023": 31342, "Dez/2022": 30705, "Dez/2021": 29710, "Dez/2020": 28537}, {"SigMesAno": "Chesp", "Dez/2025": 38834, "Dez/2024": 38359, "Dez/2023": 37849, "Dez/2022": 37933, "Dez/2021": 38138, "Dez/2020": 37821}, {"SigMesAno": "Cocel", "Dez/2025": 59489, "Dez/2024": 57838, "Dez/2023": 56970, "Dez/2022": 55626, "Dez/2021": 54838, "Dez/2020": 53687}, {"SigMesAno": "Cooperaliança", "Dez/2025": 45612, "Dez/2024": 44512, "Dez/2023": 43405, "Dez/2022": 42484, "Dez/2021": 41500, "Dez/2020": 40507}, {"SigMesAno": "Copel-Dis", "Dez/2025": 4959645, "Dez/2024": 4910172, "Dez/2023": 4807656, "Dez/2022": 4797627, "Dez/2021": 4817074, "Dez/2020": 4780506}, {"SigMesAno": "Coprel", "Dez/2025": 53934, "Dez/2024": 53619, "Dez/2023": 53691, "Dez/2022": 54421, "Dez/2021": 54975, "Dez/2020": 55805}, {"SigMesAno": "CPFL Paulista", "Dez/2025": 4874835, "Dez/2024": 4784670, "Dez/2023": 4729070, "Dez/2022": 4674686, "Dez/2021": 4663005, "Dez/2020": 4603120}, {"SigMesAno": "CPFL Piratininga", "Dez/2025": 1957056, "Dez/2024": 1915943, "Dez/2023": 1884029, "Dez/2022": 1853715, "Dez/2021": 1841199, "Dez/2020": 1804841, "Dez/2018": 1707904}, {"SigMesAno": "CPFL Santa Cruz", "Dez/2025": 514422, "Dez/2024": 499388, "Dez/2023": 486900, "Dez/2022": 483182, "Dez/2021": 479378, "Dez/2020": 469868}, {"SigMesAno": "Dcelt", "Dez/2025": 38966, "Dez/2024": 38608, "Dez/2023": 38130, "Dez/2022": 37632, "Dez/2021": 38124, "Dez/2020": 37492}, {"SigMesAno": "Demei", "Dez/2025": 33067, "Dez/2024": 32740, "Dez/2023": 32382, "Dez/2022": 32724, "Dez/2021": 33452, "Dez/2020": 33504}, {"SigMesAno": "Dmed", "Dez/2025": 87557, "Dez/2024": 86193, "Dez/2023": 84202, "Dez/2022": 82722, "Dez/2021": 80897, "Dez/2020": 79477}, {"SigMesAno": "EDP ES", "Dez/2025": 1723396, "Dez/2024": 1692701, "Dez/2023": 1665449, "Dez/2022": 1657782, "Dez/2021": 1640995, "Dez/2020": 1612276, "Dez/2019": 1556993}, {"SigMesAno": "EDP SP", "Dez/2025": 2193028, "Dez/2024": 2147300, "Dez/2023": 2132045, "Dez/2022": 2061757, "Dez/2021": 2014269, "Dez/2020": 1974508}, {"SigMesAno": "Eflul", "Dez/2025": 7404, "Dez/2024": 7339, "Dez/2023": NaN, "Dez/2022": NaN, "Dez/2021": NaN, "Dez/2020": NaN}, {"SigMesAno": "Eletrocar", "Dez/2025": 36316, "Dez/2024": 36274, "Dez/2023": 35911, "Dez/2022": 36259, "Dez/2021": 37294, "Dez/2020": 37499}, {"SigMesAno": "Enel CE", "Dez/2025": 3831271, "Dez/2024": 3795270, "Dez/2023": 3833170, "Dez/2022": 3699989, "Dez/2021": 4021432, "Dez/2020": 3789080, "Dez/2018": 3482029}, {"SigMesAno": "Enel RJ", "Dez/2025": 2631790, "Dez/2024": 2646770, "Dez/2023": 2710535, "Dez/2022": 2679005, "Dez/2021": 2680041, "Dez/2020": 2732992}, {"SigMesAno": "Enel SP", "Dez/2025": 8814724, "Dez/2024": 7895306, "Dez/2023": 7880814, "Dez/2022": 7677877, "Dez/2021": 7565685, "Dez/2020": 7438388, "Dez/2018": 7167273}, {"SigMesAno": "Energisa AC", "Dez/2025": 302314, "Dez/2024": 291731, "Dez/2023": 284919, "Dez/2022": 281219, "Dez/2021": 276443, "Dez/2020": 277752}, {"SigMesAno": "Energisa Minas-Rio", "Dez/2025": 571274, "Dez/2024": 568561, "Dez/2023": 563342, "Dez/2022": 564746, "Dez/2021": 571427, "Dez/2020": 573427}, {"SigMesAno": "Energisa MS", "Dez/2025": 1025062, "Dez/2024": 1018151, "Dez/2023": 1002163, "Dez/2022": 1011606, "Dez/2021": 1036250, "Dez/2020": 1044022, "Dez/2019": 1011408}, {"SigMesAno": "Energisa MT", "Dez/2025": 1512698, "Dez/2024": 1484279, "Dez/2023": 1461038, "Dez/2022": 1470590, "Dez/2021": 1480833, "Dez/2020": 1469831}, {"SigMesAno": "Energisa PB", "Dez/2025": 1865475, "Dez/2024": 1813072, "Dez/2023": 1764693, "Dez/2022": 1729649, "Dez/2021": 1710716, "Dez/2020": 1694775}, {"SigMesAno": "Energisa RO", "Dez/2025": 704690, "Dez/2024": 686147, "Dez/2023": 675102, "Dez/2022": 673026, "Dez/2021": 661975, "Dez/2020": 665599}, {"SigMesAno": "Energisa SE", "Dez/2025": 897202, "Dez/2024": 872847, "Dez/2023": 850495, "Dez/2022": 833968, "Dez/2021": 816622, "Dez/2020": 801700}, {"SigMesAno": "Energisa Sul-Sudeste", "Dez/2025": 832935, "Dez/2024": 821025, "Dez/2023": 811664, "Dez/2022": 808876, "Dez/2021": 812975, "Dez/2020": 807415, "Dez/2019": 793414}, {"SigMesAno": "Energisa TO", "Dez/2025": 652706, "Dez/2024": 637014, "Dez/2023": 623331, "Dez/2022": 617197, "Dez/2021": 614491, "Dez/2020": 610060}, {"SigMesAno": "Equatorial AL", "Dez/2025": 1367912, "Dez/2024": 1348599, "Dez/2023": 1312753, "Dez/2022": 1298431, "Dez/2021": 1187680, "Dez/2020": 1156889}, {"SigMesAno": "Equatorial GO", "Dez/2025": 3361059, "Dez/2024": 3274277, "Dez/2023": 3188489, "Dez/2022": 3170191, "Dez/2021": 3135232, "Dez/2020": 3085828, "Dez/2019": 2984604}, {"SigMesAno": "Equatorial MA", "Dez/2025": 2773608, "Dez/2024": 2731051, "Dez/2023": 2675748, "Dez/2022": 2627579, "Dez/2021": 2604731, "Dez/2020": 2583719, "Dez/2019": 2506620}, {"SigMesAno": "Equatorial PA", "Dez/2025": 2989292, "Dez/2024": 2969505, "Dez/2023": 2908191, "Dez/2022": 2852739, "Dez/2021": 2781321, "Dez/2020": 2719754, "Dez/2019": 2654878}, {"SigMesAno": "Equatorial PI", "Dez/2025": 1492123, "Dez/2024": 1468199, "Dez/2023": 1432534, "Dez/2022": 1368028, "Dez/2021": 1336899, "Dez/2020": 1316508}, {"SigMesAno": "Forcel", "Dez/2025": 8302, "Dez/2024": 8165, "Dez/2023": 9386, "Dez/2022": 7973, "Dez/2021": 7963, "Dez/2020": 7964}, {"SigMesAno": "Hidropan", "Dez/2025": NaN, "Dez/2024": 18693, "Dez/2023": 18471, "Dez/2022": 18396, "Dez/2021": 18863, "Dez/2020": 18773}, {"SigMesAno": "João Cesa", "Dez/2025": NaN, "Dez/2024": NaN, "Dez/2023": 3811, "Dez/2022": 3890, "Dez/2021": NaN, "Dez/2020": 3833}, {"SigMesAno": "Light", "Dez/2025": 3913860, "Dez/2024": 3841593, "Dez/2023": 3789635, "Dez/2022": 3673127, "Dez/2021": 3889155, "Dez/2020": 3903561}, {"SigMesAno": "Mux Energia", "Dez/2025": 11993, "Dez/2024": 11787, "Dez/2023": NaN, "Dez/2022": NaN, "Dez/2021": NaN, "Dez/2020": NaN}, {"SigMesAno": "Neoenergia Brasília", "Dez/2025": 1157817, "Dez/2024": 1138216, "Dez/2023": 1118771, "Dez/2022": 1121345, "Dez/2021": 1120257, "Dez/2020": 1090856}, {"SigMesAno": "Neoenergia Coelba", "Dez/2025": 6606111, "Dez/2024": 6513923, "Dez/2023": 6395577, "Dez/2022": 6322947, "Dez/2021": 6271602, "Dez/2020": 6158410}, {"SigMesAno": "Neoenergia Cosern", "Dez/2025": 1512473, "Dez/2024": 1502679, "Dez/2023": 1480343, "Dez/2022": 1480689, "Dez/2021": 1495255, "Dez/2020": 1480449}, {"SigMesAno": "Neoenergia Elektro", "Dez/2025": 2887384, "Dez/2024": 2848187, "Dez/2023": 2813007, "Dez/2022": 2792635, "Dez/2021": 2789790, "Dez/2020": 2747862}, {"SigMesAno": "Neoenergia Pernambuco", "Dez/2025": 4062312, "Dez/2024": 3946796, "Dez/2023": 3886132, "Dez/2022": 3849200, "Dez/2021": 3845401, "Dez/2020": 3793943, "Dez/2018": 3438332, "Dez/2019": 3490292}, {"SigMesAno": "Nova Palma", "Dez/2025": 16527, "Dez/2024": 16423, "Dez/2023": 16363, "Dez/2022": 16403, "Dez/2021": 16499, "Dez/2020": 16350}, {"SigMesAno": "RGE", "Dez/2025": 2908908, "Dez/2024": 2977571, "Dez/2023": 2863964, "Dez/2022": 2887978, "Dez/2021": 2903863, "Dez/2020": 2905939}, {"SigMesAno": "Roraima Energia", "Dez/2025": 215693, "Dez/2024": 210417, "Dez/2023": 204573, "Dez/2022": 198051, "Dez/2021": 189448, "Dez/2020": 178093}, {"SigMesAno": "Santa Maria", "Dez/2025": 121443, "Dez/2024": 118347, "Dez/2023": 116178, "Dez/2022": 116482, "Dez/2021": 116885, "Dez/2020": 115407}, {"SigMesAno": "Sulgipe", "Dez/2025": 174258, "Dez/2024": 169609, "Dez/2023": 165095, "Dez/2022": 161600, "Dez/2021": 158279, "Dez/2020": 155160}, {"SigMesAno": "Total", "Dez/2025": 2885151.2446670975, "Dez/2024": 2811910.799806264, "Dez/2023": 2785049.446927374, "Dez/2022": 2781882.5135826143, "Dez/2021": 2793093.476907959, "Dez/2020": 2685434.3228218467}, {"SigMesAno": NaN, "Dez/2025": NaN, "Dez/2024": NaN, "Dez/2023": NaN, "Dez/2022": NaN, "Dez/2021": NaN, "Dez/2020": NaN}, {"SigMesAno": "Filtros aplicados:\nDthReferencia 08/05/2020 - 07/05/2026\nIntervalo é 10 anos\nMesInicial é jan 2015\nMesFinal é jan 2026\nperiodo é 12 Meses\nPlano de Resultados é QRT\nquantificacao é Quantidade", "Dez/2025": NaN, "Dez/2024": NaN, "Dez/2023": NaN, "Dez/2022": NaN, "Dez/2021": NaN, "Dez/2020": NaN}];
+
+function matchUcsName(penaltyName) {
+    const n = penaltyName.toUpperCase();
+    if (n.includes("ENEL SP")) return "Enel SP";
+    if (n.includes("ENEL RJ")) return "Enel RJ";
+    if (n.includes("ENEL CE")) return "Enel CE";
+    if (n.includes("EQUATORIAL GO") || n.includes("CELG")) return "Equatorial GO";
+    if (n.includes("CEEE")) return "CEEE Equatorial";
+    if (n.includes("EQUATORIAL MA")) return "Equatorial MA";
+    if (n.includes("EQUATORIAL AL")) return "Equatorial AL";
+    if (n.includes("EQUATORIAL PI")) return "Equatorial PI";
+    if (n.includes("CELPA")) return "Equatorial PA";
+    if (n.includes("CEMIG")) return "Cemig-D";
+    if (n.includes("CPFL PAULISTA")) return "CPFL Paulista";
+    if (n.includes("PIRATININGA")) return "CPFL Piratininga";
+    if (n.includes("LIGHT")) return "Light";
+    if (n.includes("CELPE")) return "Neoenergia Pernambuco";
+    if (n.includes("COELBA")) return "Neoenergia Coelba";
+    if (n.includes("ELEKTRO")) return "Neoenergia Elektro";
+    if (n.includes("COPEL")) return "Copel-Dis";
+    if (n.includes("CELESC")) return "Celesc-Dis";
+    if (n.includes("(EMT)")) return "Energisa MT";
+    if (n.includes("(EMS)")) return "Energisa MS";
+    if (n.includes("(EMR)")) return "Energisa Minas-Rio";
+    if (n.includes("(ETO)")) return "Energisa TO";
+    if (n.includes("(CERON)")) return "Energisa RO";
+    if (n.includes("(ESS)")) return "Energisa Sul-Sudeste";
+    if (n.includes("(ESE)")) return "Energisa SE";
+    if (n.includes("(CEB)")) return "Neoenergia Brasília";
+    if (n.includes("CEA")) return "CEA Equatorial";
+    if (n.includes("RGE")) return "RGE";
+    if (n.includes("EDP SP")) return "EDP SP";
+    if (n.includes("EDP ES")) return "EDP ES";
+    if (n.includes("SULGIPE")) return "Sulgipe";
+    if (n.includes("CHESP")) return "Chesp";
+    if (n.includes("DEMEI")) return "Demei";
+    if (n.includes("NOVA PALMA")) return "Nova Palma";
+    return penaltyName;
+}
+
+let csvRowsUcs = [];
+
+function renderUcs() {
+    const tbody = document.getElementById('table-body-ucs');
+    tbody.innerHTML = '';
+    csvRowsUcs = [];
+    
+    let totalMultas = 0;
+    let globalRatios = [];
+    let totalUcs2025 = 0;
+
+    penaltiesRawUcs.forEach(p => {
+        const tr = document.createElement('tr');
+        let rowHtml = `<td class="col-name">${p.nome}</td>
+                       <td class="col-grupo">${p.grupo}</td>`;
+        
+        let rowRatios = [];
+        let csvRow = { Distribuidora: p.nome, Grupo: p.grupo };
+
+        ANOS_UCS.forEach(y => {
+            const multaMi = p[y] ? p[y][1] : 0;
+            const ucsYear = y === '2026' ? '2025' : y;
+            const ucsMatch = ucsDataUcs.find(d => d.SigMesAno === matchUcsName(p.nome));
+            const ucsVal = ucsMatch ? ucsMatch[`Dez/${ucsYear}`] : null;
+
+            if (ucsVal && !isNaN(ucsVal) && (multaMi > 0 || (p[y] && y === '2026'))) {
+                const ratio = (multaMi * 1000000) / ucsVal;
+                
+                if (multaMi > 0) {
+                    rowRatios.push(ratio);
+                    globalRatios.push(ratio);
+                    totalMultas += multaMi;
+                }
+                if (y === '2025') totalUcs2025 += ucsVal;
+
+                const cls = ratio > 10 ? 'impact-high' : (ratio > 2 ? 'impact-mid' : 'impact-low');
+                const ratioTxt = multaMi > 0 ? 'R$ '+ratio.toFixed(2) : 'Em análise';
+
+                rowHtml += `<td class="cell-trio">
+                    <span class="cell-num">R$ ${multaMi.toFixed(2)} Mi</span>
+                    <span class="cell-den">${ucsVal.toLocaleString('pt-BR')} UCs</span>
+                    <span class="cell-pct ${cls}">${ratioTxt}</span>
+                </td>`;
+
+                csvRow[`Multa ${y} (R$ Mi)`] = multaMi > 0 ? multaMi.toFixed(4) : '';
+                csvRow[`UCs ${y}`] = ucsVal;
+                csvRow[`R$/UC ${y}`] = multaMi > 0 ? ratio.toFixed(4) : '';
+            } else {
+                rowHtml += `<td style="color:#ccc; font-size:9px;">—</td>`;
+                csvRow[`Multa ${y} (R$ Mi)`] = '';
+                csvRow[`UCs ${y}`] = '';
+                csvRow[`R$/UC ${y}`] = '';
+            }
+        });
+
+        const avg = rowRatios.length ? (rowRatios.reduce((a,b)=>a+b,0)/rowRatios.length) : 0;
+        rowHtml += `<td class="font-black bg-slate-50 text-center" style="font-size:10px;">${avg > 0 ? 'R$ '+avg.toFixed(2) : '—'}</td>`;
+        csvRow['Média R$/UC'] = avg > 0 ? avg.toFixed(4) : '';
+
+        tr.innerHTML = rowHtml;
+        tbody.appendChild(tr);
+        csvRowsUcs.push(csvRow);
+    });
+
+    document.getElementById('kpi-total-cos-ucs').innerText = penaltiesRawUcs.length;
+    document.getElementById('kpi-avg-impact-ucs').innerText = "R$ " + (globalRatios.length ? (globalRatios.reduce((a,b)=>a+b,0)/globalRatios.length).toFixed(2) : "0.00");
+    document.getElementById('kpi-total-multas-ucs').innerText = "R$ " + totalMultas.toFixed(1) + " Mi";
+    document.getElementById('kpi-total-ucs-ucs').innerText = (totalUcs2025 / 1000000).toFixed(1) + " Mi";
+}
+
+function exportCSVucs() {
+    if (!csvRowsUcs.length) return;
+    const headers = Object.keys(csvRowsUcs[0]);
+    const lines = [headers.join(';')];
+    csvRowsUcs.forEach(r => {
+        const row = headers.map(h => {
+            const val = r[h] ?? '';
+            return (typeof val === 'string' && val.includes('.')) ? val.replace('.', ',') : val;
+        });
+        lines.push(row.join(';'));
+    });
+    const blob = new Blob(["﻿" + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'analise_penalidade_por_uc.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+renderUcs();
+
 </script>
 </body>
 </html>
